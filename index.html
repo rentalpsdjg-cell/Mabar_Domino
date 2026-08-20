@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Domino Gaple Multi-Device Responsive</title>
+  <title>Domino Gaple Super Complete Edition</title>
   
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Titan+One&display=swap" rel="stylesheet">
 
   <style>
@@ -26,7 +27,7 @@
     }
     .domino-card:active, .domino-card:hover { transform: translateY(-3px); }
     
-    /* Kartu Domino Papan Meja (Horizontal & Responsif) */
+    /* Kartu Domino Papan Meja (Horizontal) */
     .domino-card.horizontal {
       width: clamp(32px, 5.5vw, 52px);
       height: clamp(18px, 3.2vw, 28px);
@@ -47,19 +48,34 @@
 </head>
 <body class="h-screen w-screen text-white flex flex-col justify-between overflow-hidden">
 
-  <!-- MODAL POPUP WINNER -->
-  <div id="winner-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-fade-in">
+  <div id="choice-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+    <div class="glass-panel rounded-2xl p-5 w-full max-w-xs text-center shadow-2xl border border-amber-400">
+      <div class="font-titan text-lg text-amber-400 mb-2">PILIH SISI PAPAN 🧩</div>
+      <p class="text-xs text-emerald-200 mb-4">Kartu Anda cocok di kedua ujung papan. Ingin dipasang di mana?</p>
+      <div class="flex gap-2">
+        <button id="btn-choice-left" class="w-1/2 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 font-titan text-xs text-white shadow-lg">
+          ⬅️ UJUNG KIRI
+        </button>
+        <button id="btn-choice-right" class="w-1/2 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-titan text-xs text-slate-950 shadow-lg">
+          UJUNG KANAN ➡️
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="winner-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
     <div class="glass-panel rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl border-2 border-amber-400">
       <div class="text-5xl mb-2">🏆🎉</div>
-      <div class="font-titan text-2xl text-amber-400 mb-1">GAME SELESAI!</div>
-      <div id="winner-name" class="text-lg font-bold text-white mb-4">Pemain Menang!</div>
-      <button onclick="tutupModalDanKeLobby()" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-titan text-slate-950 text-sm shadow-lg hover:brightness-110 active:scale-95 transition-all">
-        KEMBALI KE LOBBY 🚀
+      <div id="modal-title" class="font-titan text-2xl text-amber-400 mb-1">RONDE SELESAI!</div>
+      <div id="winner-name" class="text-base font-bold text-white mb-2">Pemain Menang!</div>
+      <div id="winner-reason" class="text-xs text-emerald-300 italic mb-4">Kartu Habis</div>
+      
+      <button onclick="tutupModalDanLanjut()" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-titan text-slate-950 text-sm shadow-lg hover:brightness-110 active:scale-95 transition-all">
+        LANJUT RONDE / LOBBY 🚀
       </button>
     </div>
   </div>
 
-  <!-- LOBBY MAIN MENU -->
   <div id="lobby" class="fixed inset-0 z-40 flex items-center justify-center p-3 bg-gradient-to-br from-emerald-950 via-green-950 to-black">
     <div class="glass-panel rounded-3xl p-4 sm:p-6 w-full max-w-xs sm:max-w-sm text-center shadow-2xl border border-emerald-500/30">
       <div class="font-titan text-2xl sm:text-3xl text-amber-400 mb-1">🀏 GAPLE MULTI</div>
@@ -88,20 +104,26 @@
     </div>
   </div>
 
-  <!-- GAME ARENA -->
   <div id="arena" class="hidden flex-col h-screen w-screen bg-emerald-900 justify-between p-2 relative overflow-hidden">
     
-    <!-- Top Bar -->
     <div class="glass-panel rounded-xl p-2 flex justify-between items-center text-xs font-bold flex-shrink-0">
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
         <div>Room: <span id="disp-room" class="text-amber-400">-</span></div>
-        <span id="role-badge" class="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full border border-amber-500/30">Pemain</span>
+        <span id="role-badge" class="bg-amber-500/20 text-amber-300 text-[9px] px-1.5 py-0.5 rounded-full border border-amber-500/30">Pemain</span>
       </div>
-      <div id="disp-turn" class="text-amber-300 font-titan animate-pulse text-xs sm:text-sm">Menunggu...</div>
+      
+      <div class="flex items-center gap-2">
+        <div id="disp-turn" class="text-amber-300 font-titan text-xs">Menunggu...</div>
+        <div id="timer-box" class="hidden bg-red-950 border border-red-500/50 text-red-300 px-2 py-0.5 rounded-lg font-titan text-xs animate-pulse">
+          ⏱️ <span id="timer-val">15</span>s
+        </div>
+      </div>
+
       <button onclick="keluarRoom()" class="bg-red-600 hover:bg-red-500 px-2.5 py-1 rounded-lg text-white text-[11px]">Keluar</button>
     </div>
 
-    <!-- Panel Waiting & Tombol Mulai -->
+    <div id="leaderboard-bar" class="flex justify-around items-center bg-black/40 rounded-xl py-1 px-2 text-[10px] border border-emerald-500/20 flex-shrink-0"></div>
+
     <div id="lobby-waiting" class="glass-panel rounded-xl p-2 text-center my-1 flex-shrink-0">
       <div class="text-[11px] text-emerald-200 mb-1">Pemain Terhubung (<span id="player-count">1</span>/4):</div>
       <div id="player-list" class="flex flex-wrap justify-center gap-1 text-[11px] font-bold mb-2"></div>
@@ -111,12 +133,10 @@
       </button>
     </div>
 
-    <!-- Board Arena (Papan Domino - Multi Line Wrap) -->
     <div id="board" class="flex-1 my-1 glass-panel rounded-xl p-2 flex flex-wrap items-center justify-center content-center gap-1.5 border border-emerald-600/40 shadow-inner overflow-hidden min-h-0">
       <div id="empty-board-msg" class="w-full text-center text-emerald-300/50 text-xs italic">Tekan "Mulai Game" untuk melempar kartu.</div>
     </div>
 
-    <!-- Hands & Pass Button -->
     <div id="bottom-panel" class="glass-panel rounded-xl p-2 flex flex-col gap-1 flex-shrink-0">
       <div class="flex justify-between items-center text-[11px] px-1">
         <span id="hand-label" class="font-bold text-emerald-200">Kartu Anda (<span id="card-count">0</span>):</span>
@@ -144,6 +164,7 @@
 
     let myName = "", roomID = "", myID = "", roomRef = null, gameState = {}, isSpectator = false;
     let lastBoardLength = 0;
+    let turnTimerInterval = null, turnTimeLeft = 15;
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -173,11 +194,15 @@
       }
     }
 
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      }
+    }
+
     function toggleFullscreen() {
       if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch((err) => {
-          alert(`Gagal Fullscreen: ${err.message}`);
-        });
+        document.documentElement.requestFullscreen().catch((err) => { alert(`Gagal Fullscreen: ${err.message}`); });
       } else if (document.exitFullscreen) {
         document.exitFullscreen();
       }
@@ -208,12 +233,12 @@
           if (isSpectator) {
             data = {
               players: {}, spectators: { [myID]: { name: myName } },
-              playerOrder: [], currentTurnIdx: 0, board: [], leftVal: -1, rightVal: -1, status: "waiting", host: ""
+              playerOrder: [], currentTurnIdx: 0, board: [], leftVal: -1, rightVal: -1, status: "waiting", host: "", consecutivePasses: 0, scores: {}
             };
           } else {
             data = {
               players: { [myID]: { name: myName, hand: [], isBot: false } },
-              spectators: {}, playerOrder: [myID], currentTurnIdx: 0, board: [], leftVal: -1, rightVal: -1, status: "waiting", host: myID
+              spectators: {}, playerOrder: [myID], currentTurnIdx: 0, board: [], leftVal: -1, rightVal: -1, status: "waiting", host: myID, consecutivePasses: 0, scores: { [myID]: 0 }
             };
           }
           roomRef.set(data);
@@ -225,8 +250,10 @@
             } else if (!data.players[myID] && data.status === "waiting") {
               if (!data.players) data.players = {};
               if (!data.playerOrder) data.playerOrder = [];
+              if (!data.scores) data.scores = {};
               data.players[myID] = { name: myName, hand: [], isBot: false };
               data.playerOrder.push(myID);
+              data.scores[myID] = 0;
               if (!data.host) data.host = myID;
               roomRef.update(data);
             }
@@ -243,7 +270,7 @@
         
         const badge = document.getElementById('role-badge');
         badge.innerText = isSpectator ? "👁️ JURI / PENONTON" : "🎮 PEMAIN";
-        badge.className = isSpectator ? "bg-blue-500/20 text-blue-300 text-[10px] px-2 py-0.5 rounded-full border border-blue-500/30" : "bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full border border-amber-500/30";
+        badge.className = isSpectator ? "bg-blue-500/20 text-blue-300 text-[9px] px-1.5 py-0.5 rounded-full border border-blue-500/30" : "bg-amber-500/20 text-amber-300 text-[9px] px-1.5 py-0.5 rounded-full border border-amber-500/30";
 
         dengarkanServer();
       });
@@ -252,7 +279,6 @@
     function specialResetRoom() {
       const code = document.getElementById('room-code').value.trim();
       if (!code) { alert("Masukkan Kode Room!"); return; }
-
       if (confirm(`Hapus & Reset Room [${code}]?`)) {
         db.ref('rooms/domino_' + code).remove().then(() => alert(`Room ${code} berhasil di-reset!`));
       }
@@ -269,31 +295,85 @@
         }
         lastBoardLength = currentBoardLength;
 
-        // CEK STATUS KEMENANGAN GAME
+        // CEK STATUS KEMENANGAN
         if (gameState.status === 'finished') {
-          tampilkanPengumumanMenang(gameState.winnerName);
+          clearInterval(turnTimerInterval);
+          tampilkanPengumumanMenang(gameState.winnerName, gameState.winReason || "Kartu Habis");
           return;
         }
 
         renderLobbyStatus();
+        renderLeaderboard();
         renderBoard();
         renderHand();
         updateTurnDisplay();
+        startTurnTimer();
         cekBotTurn();
       });
     }
 
-    function tampilkanPengumumanMenang(winnerName) {
-      document.getElementById('winner-name').innerText = `🎉 SELAMAT! ${winnerName} MENANG! 🎉`;
-      document.getElementById('winner-modal').classList.remove('hidden');
+    function renderLeaderboard() {
+      const lb = document.getElementById('leaderboard-bar');
+      const players = gameState.players || {};
+      const scores = gameState.scores || {};
+
+      lb.innerHTML = Object.keys(players).map(pId => {
+        const p = players[pId];
+        const sc = scores[pId] || 0;
+        return `<div class="flex items-center gap-1"><span class="text-amber-300 font-bold truncate max-w-[50px]">${p.name}:</span> <span class="text-white font-titan">${sc} Win</span></div>`;
+      }).join('<span class="text-emerald-600">|</span>');
     }
 
-    function tutupModalDanKeLobby() {
+    function startTurnTimer() {
+      clearInterval(turnTimerInterval);
+      if (gameState.status !== 'playing') {
+        document.getElementById('timer-box').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('timer-box').classList.remove('hidden');
+      turnTimeLeft = 15;
+      document.getElementById('timer-val').innerText = turnTimeLeft;
+
+      turnTimerInterval = setInterval(() => {
+        turnTimeLeft--;
+        document.getElementById('timer-val').innerText = turnTimeLeft;
+
+        if (turnTimeLeft <= 0) {
+          clearInterval(turnTimerInterval);
+          // Auto Pass jika habis waktu
+          const currentTurnID = gameState.playerOrder[gameState.currentTurnIdx];
+          if (currentTurnID === myID && !isSpectator) {
+            passTurn();
+          }
+        }
+      }, 1000);
+    }
+
+    function tampilkanPengumumanMenang(winnerName, reason) {
+      document.getElementById('winner-name').innerText = `🎉 SELAMAT! ${winnerName} MENANG! 🎉`;
+      document.getElementById('winner-reason').innerText = `Alasan: ${reason}`;
+      document.getElementById('winner-modal').classList.remove('hidden');
+      triggerConfetti();
+    }
+
+    function tutupModalDanLanjut() {
       document.getElementById('winner-modal').classList.add('hidden');
       
       if (roomRef && (gameState.host === myID || gameState.playerOrder?.[0] === myID)) {
-        // Reset state room ke status waiting
-        roomRef.update({ status: "waiting", board: [], leftVal: -1, rightVal: -1, winnerName: null });
+        let scores = gameState.scores || {};
+        let winnerID = Object.keys(gameState.players).find(id => gameState.players[id].name === gameState.winnerName);
+        if (winnerID) {
+          scores[winnerID] = (scores[winnerID] || 0) + 1;
+        }
+
+        // Jika sudah ada yang 3x Menang, Reset Penuh ke Lobby
+        if (winnerID && scores[winnerID] >= 3) {
+          alert(`🏆 ${gameState.winnerName} MENJADI JUARA UTAMA DENGAN 3 KEMENANGAN! Game di-reset.`);
+          roomRef.update({ status: "waiting", board: [], leftVal: -1, rightVal: -1, winnerName: null, scores: {} });
+        } else {
+          roomRef.update({ status: "waiting", board: [], leftVal: -1, rightVal: -1, winnerName: null, scores });
+        }
       }
 
       keluarRoom();
@@ -324,18 +404,20 @@
       let deck = generateDeck();
       let players = gameState.players || {};
       let order = gameState.playerOrder ? [...gameState.playerOrder] : [];
+      let scores = gameState.scores || {};
 
       let botCount = 1;
       while (order.length < 4) {
         let botID = "bot_" + botCount;
         players[botID] = { name: "Bot " + botCount, hand: [], isBot: true };
+        scores[botID] = scores[botID] || 0;
         order.push(botID);
         botCount++;
       }
 
       order.forEach(pId => { players[pId].hand = deck.splice(0, 7); });
 
-      roomRef.update({ players, playerOrder: order, status: "playing", board: [], leftVal: -1, rightVal: -1, currentTurnIdx: 0, winnerName: null });
+      roomRef.update({ players, playerOrder: order, scores, status: "playing", board: [], leftVal: -1, rightVal: -1, currentTurnIdx: 0, consecutivePasses: 0, winnerName: null });
     }
 
     function updateTurnDisplay() {
@@ -368,10 +450,12 @@
       let botHand = gameState.players[botID].hand || [];
       let board = gameState.board || [];
       let left = gameState.leftVal, right = gameState.rightVal;
+      let passes = gameState.consecutivePasses || 0;
 
       if (board.length === 0) {
         let card = botHand.shift();
         board.push(card); left = card[0]; right = card[1];
+        passes = 0;
       } else {
         let matchIdx = -1, isLeft = false, flip = false;
         for (let i = 0; i < botHand.length; i++) {
@@ -386,20 +470,44 @@
           let c = botHand.splice(matchIdx, 1)[0];
           if (isLeft) { board.unshift(flip ? [c[1], c[0]] : c); left = flip ? c[1] : c[0]; }
           else { board.push(flip ? [c[1], c[0]] : c); right = flip ? c[0] : c[1]; }
+          passes = 0;
         } else {
           playPassVoice();
+          passes++;
         }
+      }
+
+      // CEK GAPLE / DEADLOCK (Semua PASS 4x)
+      if (passes >= gameState.playerOrder.length) {
+        hitungKemenanganGaple();
+        return;
       }
 
       // CEK KEMENANGAN BOT
       if (botHand.length === 0) {
         const botName = gameState.players[botID].name;
-        roomRef.update({ board, status: "finished", winnerName: botName });
+        roomRef.update({ board, status: "finished", winnerName: botName, winReason: "Kartu Habis!" });
         return;
       }
 
       let nextTurn = (gameState.currentTurnIdx + 1) % gameState.playerOrder.length;
-      roomRef.update({ board, leftVal: left, rightVal: right, [`players/${botID}/hand`]: botHand, currentTurnIdx: nextTurn });
+      roomRef.update({ board, leftVal: left, rightVal: right, [`players/${botID}/hand`]: botHand, currentTurnIdx: nextTurn, consecutivePasses: passes });
+    }
+
+    function hitungKemenanganGaple() {
+      let minDots = 999;
+      let winnerName = "Tidak Ada";
+      const players = gameState.players || {};
+
+      Object.values(players).forEach(p => {
+        let totalDots = (p.hand || []).reduce((sum, c) => sum + c[0] + c[1], 0);
+        if (totalDots < minDots) {
+          minDots = totalDots;
+          winnerName = p.name;
+        }
+      });
+
+      roomRef.update({ status: "finished", winnerName, winReason: `GAPLE / DEADLOCK! (Sisa Bintik Terkecil: ${minDots})` });
     }
 
     function renderDotPattern(num) {
@@ -468,36 +576,83 @@
       let newCard = [...card];
 
       if (board.length === 0) {
-        board.push(newCard); left = newCard[0]; right = newCard[1];
+        eksekusiPasang(newCard, idx, 'right');
       } else {
+        let fitLeft = (newCard[0] === left || newCard[1] === left);
+        let fitRight = (newCard[0] === right || newCard[1] === right);
+
+        // FITUR PILIHAN SISIPAN (Jika cocok di Kiri DAN Kanan)
+        if (fitLeft && fitRight && left !== right) {
+          tampilkanPilihanSisi(newCard, idx);
+        } else if (fitLeft) {
+          eksekusiPasang(newCard, idx, 'left');
+        } else if (fitRight) {
+          eksekusiPasang(newCard, idx, 'right');
+        } else {
+          alert("Kartu tidak cocok!");
+        }
+      }
+    }
+
+    function tampilkanPilihanSisi(card, idx) {
+      const modal = document.getElementById('choice-modal');
+      modal.classList.remove('hidden');
+
+      document.getElementById('btn-choice-left').onclick = () => {
+        modal.classList.add('hidden');
+        eksekusiPasang(card, idx, 'left');
+      };
+      document.getElementById('btn-choice-right').onclick = () => {
+        modal.classList.add('hidden');
+        eksekusiPasang(card, idx, 'right');
+      };
+    }
+
+    function eksekusiPasang(card, idx, side) {
+      let board = gameState.board || [];
+      let left = gameState.leftVal, right = gameState.rightVal;
+      let newCard = [...card];
+
+      if (board.length === 0) {
+        board.push(newCard); left = newCard[0]; right = newCard[1];
+      } else if (side === 'left') {
         if (newCard[1] === left) { board.unshift(newCard); left = newCard[0]; }
-        else if (newCard[0] === left) { board.unshift([newCard[1], newCard[0]]); left = newCard[1]; }
-        else if (newCard[0] === right) { board.push(newCard); right = newCard[1]; }
-        else if (newCard[1] === right) { board.push([newCard[1], newCard[0]]); right = newCard[0]; }
-        else { alert("Kartu tidak cocok!"); return; }
+        else { board.unshift([newCard[1], newCard[0]]); left = newCard[1]; }
+      } else {
+        if (newCard[0] === right) { board.push(newCard); right = newCard[1]; }
+        else { board.push([newCard[1], newCard[0]]); right = newCard[0]; }
       }
 
       let myHand = gameState.players[myID].hand;
       myHand.splice(idx, 1);
 
-      // CEK KEMENANGAN PEMAIN
       if (myHand.length === 0) {
-        roomRef.update({ board, status: "finished", winnerName: myName, [`players/${myID}/hand`]: [] });
+        roomRef.update({ board, status: "finished", winnerName: myName, winReason: "Kartu Habis!", [`players/${myID}/hand`]: [] });
         return;
       }
 
       let nextTurn = (gameState.currentTurnIdx + 1) % gameState.playerOrder.length;
-      roomRef.update({ board, leftVal: left, rightVal: right, [`players/${myID}/hand`]: myHand, currentTurnIdx: nextTurn });
+      roomRef.update({ board, leftVal: left, rightVal: right, [`players/${myID}/hand`]: myHand, currentTurnIdx: nextTurn, consecutivePasses: 0 });
     }
 
     function passTurn() {
       if (isSpectator) return;
       playPassVoice();
+
+      let passes = (gameState.consecutivePasses || 0) + 1;
+
+      // CEK GAPLE / DEADLOCK
+      if (passes >= gameState.playerOrder.length) {
+        hitungKemenanganGaple();
+        return;
+      }
+
       let nextTurn = (gameState.currentTurnIdx + 1) % gameState.playerOrder.length;
-      roomRef.update({ currentTurnIdx: nextTurn });
+      roomRef.update({ currentTurnIdx: nextTurn, consecutivePasses: passes });
     }
 
     function keluarRoom() {
+      clearInterval(turnTimerInterval);
       if (roomRef) {
         if (isSpectator && myID) db.ref(`rooms/${roomID}/spectators/${myID}`).remove();
         roomRef.off();
