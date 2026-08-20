@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Domino Gaple Super Ultimate Pro</title>
+  <title>Domino Gaple VIP Casino Super Elit</title>
   
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Titan+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Titan+One&display=swap" rel="stylesheet">
 
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -21,108 +21,167 @@
       padding: 0; 
       overflow: hidden; 
       font-family: 'Fredoka', sans-serif; 
-      background: #061e12; 
+      background: #041208; 
     }
     .font-titan { font-family: 'Titan One', cursive; }
 
-    .theme-emerald { background: radial-gradient(circle, #0c3823 0%, #04120b 100%); }
-    .theme-blue { background: radial-gradient(circle, #0f2b48 0%, #040d18 100%); }
-    .theme-ruby { background: radial-gradient(circle, #480f1a 0%, #180407 100%); }
-    .theme-obsidian { background: radial-gradient(circle, #222226 0%, #0a0a0c 100%); }
+    /* Meja Kasino Karpet VIP */
+    .vip-table {
+      background: radial-gradient(circle at center, #155734 0%, #0b331e 70%, #04140b 100%);
+      border: 4px solid #d4af37;
+      box-shadow: inset 0 0 50px rgba(0,0,0,0.8), 0 0 20px rgba(212, 175, 55, 0.3);
+    }
 
-    /* Kartu Tangan Vertikal */
+    /* KARTU GAPLE IVORY / GADING SUPER CLEAR & KONTRAS */
     .domino-card {
-      width: clamp(26px, 7vw, 36px);
-      height: clamp(48px, 13vw, 64px);
-      background: #fdfbf7; 
-      border: 1.5px solid #1a1a1a; 
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.4); 
+      width: clamp(38px, 10vw, 48px);
+      height: clamp(72px, 18vw, 90px);
+      background: linear-gradient(145deg, #ffffff 0%, #f0f0e8 100%); 
+      border: 2px solid #111111; 
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,1); 
       display: flex; 
       flex-direction: column;
       justify-content: space-between; 
       align-items: center; 
-      padding: 2px;
+      padding: 4px;
       cursor: pointer; 
       flex-shrink: 0;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
-    .domino-card:active { transform: scale(1.08); }
-    .domino-card.mini { width: 18px; height: 32px; border-width: 1px; padding: 1px; border-radius: 3px; }
+    .domino-card:active { transform: scale(1.1) translateY(-8px); z-index: 30; }
 
     /* Kartu Meja Horizontal */
     .domino-card.horizontal {
-      width: clamp(42px, 11vw, 56px); 
-      height: clamp(24px, 6vw, 32px);
+      width: clamp(68px, 17vw, 84px); 
+      height: clamp(38px, 9.5vw, 46px);
       flex-direction: row; 
-      border-width: 1.5px; 
-      border-radius: 4px; 
-      padding: 2px;
+      padding: 4px;
     }
 
-    .domino-divider-v { width: 100%; height: 1.5px; background: #333; margin: 1px 0; }
-    .domino-divider-h { height: 100%; width: 1.5px; background: #333; margin: 0 1px; }
+    .domino-card.mini {
+      width: 24px; height: 42px; padding: 2px; border-width: 1px; border-radius: 4px;
+    }
 
+    .domino-divider-v { width: 100%; height: 2px; background: #222; margin: 2px 0; opacity: 0.8; }
+    .domino-divider-h { height: 100%; width: 2px; background: #222; margin: 0 2px; opacity: 0.8; }
+
+    /* Bintik Hitam Tajam / Merah (Balak) */
     .dot-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 100%; height: 100%; place-items: center; }
-    .dot { width: clamp(2.5px, 0.9vw, 4px); height: clamp(2.5px, 0.9vw, 4px); background-color: #111; border-radius: 50%; }
-    .domino-card.mini .dot { width: 2px; height: 2px; }
+    .dot { 
+      width: clamp(4.5px, 1.2vw, 6.5px); 
+      height: clamp(4.5px, 1.2vw, 6.5px); 
+      background-color: #0d0d0d; 
+      border-radius: 50%;
+      box-shadow: inset 0 1px 1px rgba(255,255,255,0.4);
+    }
+    .domino-card.balak .dot { background-color: #dc2626; } /* Bintik Merah Khusus Balak */
+    .domino-card.mini .dot { width: 3px; height: 3px; }
 
-    .glass-panel { background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); }
-    .custom-scroll::-webkit-scrollbar { height: 3px; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, 0.5); border-radius: 4px; }
+    /* Glass Effect Panel Elit */
+    .glass-panel { background: rgba(10, 25, 16, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(212, 175, 55, 0.4); }
+    .custom-scroll::-webkit-scrollbar { height: 4px; width: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 4px; }
+
+    /* Turn Active Glow */
+    .active-turn-glow {
+      box-shadow: 0 0 15px #f59e0b, inset 0 0 10px #f59e0b;
+      border-color: #fbbf24 !important;
+      animation: pulse-glow 1.5s infinite alternate;
+    }
+    @keyframes pulse-glow {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.04); }
+    }
   </style>
 </head>
-<body id="app-body" class="h-full w-full text-white flex flex-col justify-between overflow-hidden theme-emerald">
+<body id="app-body" class="h-full w-full text-white flex flex-col justify-between overflow-hidden">
 
-  <!-- MODAL EMOTE -->
-  <div id="emote-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-    <div class="glass-panel rounded-2xl p-4 w-full max-w-xs text-center border border-amber-400/50">
-      <div class="font-titan text-sm text-amber-400 mb-3">KIRIM EKSPRESI 💬</div>
-      <div class="grid grid-cols-2 gap-2 mb-3">
-        <button onclick="kirimEmote('🤣 Wkwkwk!')" class="py-2 bg-slate-800 rounded-lg text-xs font-bold border border-slate-600">🤣 Wkwkwk!</button>
-        <button onclick="kirimEmote('😱 Aduhh Gaple!')" class="py-2 bg-slate-800 rounded-lg text-xs font-bold border border-slate-600">😱 Aduhh Gaple!</button>
-        <button onclick="kirimEmote('⚡ Buru-Buru!')" class="py-2 bg-slate-800 rounded-lg text-xs font-bold border border-slate-600">⚡ Buru-Buru!</button>
-        <button onclick="kirimEmote('🔥 Yakin Menang!')" class="py-2 bg-slate-800 rounded-lg text-xs font-bold border border-slate-600">🔥 Yakin Menang!</button>
+  <!-- MODAL PANDUAN CARA BERMAIN -->
+  <div id="guide-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+    <div class="glass-panel rounded-3xl p-5 w-full max-w-sm border-2 border-amber-400 text-left flex flex-col max-h-[85vh]">
+      <div class="font-titan text-base text-amber-400 text-center mb-2 border-b border-amber-400/30 pb-2">📖 PANDUAN CARA BERMAIN VIP</div>
+      <div class="overflow-y-auto custom-scroll text-xs space-y-3 pr-1 text-emerald-100">
+        <div>
+          <span class="font-bold text-amber-300">🎯 Aturan Dasar:</span>
+          <p class="text-[11px] mt-0.5">Sambungkan nilai bintik kartu gading kamu dengan ujung terbuka di meja kiri atau kanan.</p>
+        </div>
+        <div>
+          <span class="font-bold text-amber-300">⛏️ Fitur Cangkul (1v1 & Trio 3P):</span>
+          <p class="text-[11px] mt-0.5">Jika tidak ada kartu yang cocok, tekan tombol <b>CANGKUL</b> untuk mengambil kartu sisa dari deck hingga ketemu yang pas.</p>
+        </div>
+        <div>
+          <span class="font-bold text-amber-300">💰 Chip Taruhan Kasino:</span>
+          <p class="text-[11px] mt-0.5">Setiap pemain menyetor chip taruhan room. Pemenang ronde akan memborong seluruh total Pot Kasino!</p>
+        </div>
+        <div>
+          <span class="font-bold text-amber-300">⚔️ Mode Pertandingan:</span>
+          <ul class="list-disc pl-4 text-[11px] space-y-1 mt-0.5">
+            <li><b>1v1 Duel:</b> 2 Pemain (7 Kartu + Cangkulan)</li>
+            <li><b>3P Trio:</b> 3 Pemain (7 Kartu + Cangkulan)</li>
+            <li><b>4P Solo:</b> Free For All (Semua kartu terbagi habis)</li>
+            <li><b>4P Tim:</b> 2 vs 2 (Pemain 1&3 vs Pemain 2&4)</li>
+          </ul>
+        </div>
+        <div>
+          <span class="font-bold text-amber-300">🛑 Kondisi Gaple (Mati Jalan):</span>
+          <p class="text-[11px] mt-0.5">Jika jalan terkunci total/semua PASS, pemenang ditentukan dari pemilik total bintik sisa terkecil.</p>
+        </div>
       </div>
-      <button onclick="toggleModal('emote-modal')" class="w-full py-1.5 bg-red-600 rounded-xl text-xs font-titan">TUTUP</button>
+      <button onclick="toggleModal('guide-modal')" class="w-full mt-4 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 rounded-xl font-titan text-xs shadow-lg">MENGERTI 👍</button>
+    </div>
+  </div>
+
+  <!-- MODAL EMOTE CHAT -->
+  <div id="emote-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="glass-panel rounded-2xl p-4 w-full max-w-xs text-center border border-amber-400">
+      <div class="font-titan text-sm text-amber-400 mb-3">KIRIM EKSPRESI VIP 💬</div>
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <button onclick="kirimEmote('🤣 Wkwkwk!')" class="py-2.5 bg-slate-900 rounded-xl text-xs font-bold border border-emerald-500/40 hover:border-amber-400">🤣 Wkwkwk!</button>
+        <button onclick="kirimEmote('😱 Aduhh Gaple!')" class="py-2.5 bg-slate-900 rounded-xl text-xs font-bold border border-emerald-500/40 hover:border-amber-400">😱 Aduhh Gaple!</button>
+        <button onclick="kirimEmote('⚡ Buru-Buru!')" class="py-2.5 bg-slate-900 rounded-xl text-xs font-bold border border-emerald-500/40 hover:border-amber-400">⚡ Buru-Buru!</button>
+        <button onclick="kirimEmote('🔥 Yakin Menang!')" class="py-2.5 bg-slate-900 rounded-xl text-xs font-bold border border-emerald-500/40 hover:border-amber-400">🔥 Yakin Menang!</button>
+      </div>
+      <button onclick="toggleModal('emote-modal')" class="w-full py-2 bg-red-600 rounded-xl text-xs font-titan">TUTUP</button>
     </div>
   </div>
 
   <!-- MODAL CARD TRACKER -->
-  <div id="tracker-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-    <div class="glass-panel rounded-2xl p-4 w-full max-w-xs text-center border border-emerald-400/50">
-      <div class="font-titan text-sm text-emerald-400 mb-2">📊 SIANG & SISA KARTU (0 - 6)</div>
+  <div id="tracker-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
+    <div class="glass-panel rounded-2xl p-4 w-full max-w-xs text-center border border-emerald-400">
+      <div class="font-titan text-sm text-emerald-400 mb-2">📊 TRACKER SIANG & KARTU MEJA</div>
       <div id="tracker-grid" class="grid grid-cols-7 gap-1 text-xs font-bold mb-4"></div>
-      <button onclick="toggleModal('tracker-modal')" class="w-full py-1.5 bg-emerald-600 rounded-xl text-xs font-titan">TUTUP</button>
+      <button onclick="toggleModal('tracker-modal')" class="w-full py-2 bg-emerald-600 rounded-xl text-xs font-titan">TUTUP</button>
     </div>
   </div>
 
   <!-- MODAL PILIHAN SISI -->
   <div id="choice-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-    <div class="glass-panel rounded-2xl p-5 w-full max-w-xs text-center border border-amber-400">
+    <div class="glass-panel rounded-2xl p-5 w-full max-w-xs text-center border-2 border-amber-400">
       <div class="font-titan text-lg text-amber-400 mb-2">PILIH SISI PAPAN 🧩</div>
       <p class="text-xs text-emerald-200 mb-4">Kartu Anda cocok di kedua ujung. Dipasang di mana?</p>
       <div class="flex gap-2">
-        <button id="btn-choice-left" class="w-1/2 py-2 rounded-xl bg-blue-600 font-titan text-xs text-white">⬅️ KIRI</button>
-        <button id="btn-choice-right" class="w-1/2 py-2 rounded-xl bg-amber-500 font-titan text-xs text-slate-950">KANAN ➡️</button>
+        <button id="btn-choice-left" class="w-1/2 py-2.5 rounded-xl bg-blue-600 font-titan text-xs text-white shadow-lg">⬅️ KIRI</button>
+        <button id="btn-choice-right" class="w-1/2 py-2.5 rounded-xl bg-amber-500 font-titan text-xs text-slate-950 shadow-lg">KANAN ➡️</button>
       </div>
     </div>
   </div>
 
   <!-- MODAL WINNER -->
   <div id="winner-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 overflow-y-auto">
-    <div class="glass-panel rounded-3xl p-4 w-full max-w-sm text-center border-2 border-amber-400 my-auto shadow-2xl">
-      <div class="text-4xl mb-1">🏆🎉</div>
+    <div class="glass-panel rounded-3xl p-5 w-full max-w-sm text-center border-2 border-amber-400 my-auto shadow-2xl">
+      <div class="text-5xl mb-2">🏆👑</div>
       <div id="modal-title" class="font-titan text-xl text-amber-400 mb-0.5">RONDE SELESAI!</div>
-      <div id="winner-name" class="text-sm font-bold text-white mb-1">Pemain Menang!</div>
-      <div id="winner-reason" class="text-[11px] text-emerald-300 italic mb-1">Kartu Habis</div>
-      <div id="winner-coins-won" class="text-xs font-bold text-amber-300 mb-3">💰 Total Hadiah: +0 Koin</div>
+      <div id="winner-name" class="text-base font-bold text-white mb-1">Pemain Menang!</div>
+      <div id="winner-reason" class="text-xs text-emerald-300 italic mb-2">Kartu Habis</div>
+      <div id="winner-coins-won" class="text-xs font-bold text-amber-300 bg-amber-950/80 border border-amber-500/50 py-1.5 px-3 rounded-xl inline-block mb-4">💰 Total Hadiah: +0 Chip</div>
 
-      <div id="showdown-container" class="hidden bg-slate-950/80 rounded-2xl p-2.5 border border-slate-700/80 mb-4 text-left max-h-[35vh] overflow-y-auto">
-        <div class="font-titan text-center text-xs text-amber-300 mb-2 border-b border-slate-800 pb-1">⚡ HASIL SISA KARTU PEMAIN ⚡</div>
+      <div id="showdown-container" class="hidden bg-slate-950/90 rounded-2xl p-3 border border-slate-700/80 mb-4 text-left max-h-[35vh] overflow-y-auto">
+        <div class="font-titan text-center text-xs text-amber-300 mb-2 border-b border-slate-800 pb-1">⚡ HASIL REKAP SISA KARTU PEMAIN ⚡</div>
         <div id="showdown-list" class="flex flex-col gap-2"></div>
       </div>
 
-      <button onclick="lanjutkanRondeAtauSelesai()" class="w-full py-2.5 rounded-xl bg-amber-500 font-titan text-slate-950 text-xs shadow-lg">
+      <button onclick="lanjutkanRondeAtauSelesai()" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 font-titan text-slate-950 text-xs shadow-xl">
         RONDE BERIKUTNYA 🚀
       </button>
     </div>
@@ -130,16 +189,27 @@
 
   <!-- LOBBY MAIN MENU -->
   <div id="lobby" class="fixed inset-0 z-40 flex items-center justify-center p-3 bg-gradient-to-br from-emerald-950 via-green-950 to-black overflow-y-auto">
-    <div class="glass-panel rounded-3xl p-4 w-full max-w-xs text-center border border-emerald-500/30">
-      <div class="font-titan text-2xl text-amber-400 mb-1">🀏 GAPLE ULTIMATE PRO</div>
-      <p class="text-[11px] text-emerald-200/80 mb-3">Sistem Taruhan, Cangkul & Multi-Mode</p>
+    <div class="glass-panel rounded-3xl p-5 w-full max-w-xs text-center border-2 border-amber-400/60 shadow-2xl relative">
+      
+      <!-- Tombol Panduan Cara Bermain & Fullscreen di Lobby Header -->
+      <div class="flex justify-between items-center mb-3">
+        <button onclick="toggleModal('guide-modal')" class="bg-amber-500/20 border border-amber-400/60 text-amber-300 px-2.5 py-1 rounded-xl text-[10px] font-bold flex items-center gap-1">
+          📖 Cara Main
+        </button>
+        <button onclick="toggleFullscreen()" class="bg-blue-600/30 border border-blue-400/60 text-blue-200 px-2.5 py-1 rounded-xl text-[10px] font-bold flex items-center gap-1">
+          🖥️ Fullscreen
+        </button>
+      </div>
 
-      <input type="text" id="player-name" placeholder="Nama Anda (cth: Fitri / Dodi)" class="w-full py-2 px-3 rounded-xl bg-slate-900/90 border border-emerald-500/50 text-white font-bold text-center text-xs mb-2 outline-none focus:border-amber-400">
-      <input type="number" id="room-code" placeholder="Kode Room (cth: 888)" class="w-full py-2 px-3 rounded-xl bg-slate-900/90 border border-emerald-500/50 text-white font-bold text-center text-xs mb-2 outline-none focus:border-amber-400">
+      <div class="font-titan text-2xl text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 mb-1">🀏 GAPLE VIP ELIT</div>
+      <p class="text-[11px] text-emerald-200/90 mb-4">Edisi Meja Kasino Mewah & Kartu Ivory</p>
 
-      <div class="flex items-center justify-between bg-slate-900/80 p-1.5 rounded-xl border border-emerald-500/40 mb-2">
+      <input type="text" id="player-name" placeholder="Nama Anda (cth: Sultan / Fitri)" class="w-full py-2.5 px-3 rounded-xl bg-slate-900/90 border border-amber-400/50 text-white font-bold text-center text-xs mb-2.5 outline-none focus:border-amber-400">
+      <input type="number" id="room-code" placeholder="Kode Room (cth: 888)" class="w-full py-2.5 px-3 rounded-xl bg-slate-900/90 border border-amber-400/50 text-white font-bold text-center text-xs mb-2.5 outline-none focus:border-amber-400">
+
+      <div class="flex items-center justify-between bg-slate-900/80 p-2 rounded-xl border border-emerald-500/40 mb-2">
         <span class="text-[11px] font-bold text-emerald-200 pl-1">Mode Game:</span>
-        <select id="game-mode" class="bg-emerald-950 text-amber-300 font-titan text-xs py-1 px-1.5 rounded-lg outline-none border border-emerald-600">
+        <select id="game-mode" class="bg-emerald-950 text-amber-300 font-titan text-xs py-1 px-2 rounded-lg outline-none border border-amber-500/40">
           <option value="1v1">⚔️ Duel 1v1 (2 Pemain)</option>
           <option value="3p">🔥 Trio Cangkul (3 Pemain)</option>
           <option value="solo">👤 Solo (4 Pemain)</option>
@@ -147,72 +217,73 @@
         </select>
       </div>
 
-      <div class="flex items-center justify-between bg-slate-900/80 p-1.5 rounded-xl border border-emerald-500/40 mb-3">
-        <span class="text-[11px] font-bold text-emerald-200 pl-1">Taruhan Room:</span>
-        <select id="bet-amount" class="bg-emerald-950 text-amber-300 font-titan text-xs py-1 px-1.5 rounded-lg outline-none border border-emerald-600">
-          <option value="100">💰 100 Koin</option>
-          <option value="200">💰 200 Koin</option>
-          <option value="500">💰 500 Koin</option>
+      <div class="flex items-center justify-between bg-slate-900/80 p-2 rounded-xl border border-emerald-500/40 mb-4">
+        <span class="text-[11px] font-bold text-emerald-200 pl-1">Taruhan Chip:</span>
+        <select id="bet-amount" class="bg-emerald-950 text-amber-300 font-titan text-xs py-1 px-2 rounded-lg outline-none border border-amber-500/40">
+          <option value="100">💰 100 Chip</option>
+          <option value="200">💰 200 Chip</option>
+          <option value="500">💰 500 Chip</option>
         </select>
       </div>
 
-      <button onclick="masukRoom(false)" class="w-full py-2.5 rounded-xl bg-amber-500 font-titan text-xs text-slate-950 shadow-lg mb-2">
-        MASUK PEMAIN 🚀
+      <button onclick="masukRoom(false)" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 font-titan text-xs text-slate-950 shadow-xl mb-2">
+        MASUK PEMAIN VIP 🚀
       </button>
-      <button onclick="masukRoom(true)" class="w-full py-2 rounded-xl bg-blue-600 font-titan text-xs text-white shadow-lg mb-2">
-        👁️ JADI JURI / PENONTON
+      <button onclick="masukRoom(true)" class="w-full py-2.5 rounded-xl bg-blue-600 font-titan text-xs text-white shadow-lg mb-2">
+        👁️ PENONTON / JURI
       </button>
-      <button onclick="specialResetRoom()" class="w-full py-1.5 rounded-xl bg-red-900 border border-red-500/40 font-titan text-[10px] text-red-200">💥 Reset Room</button>
+      <button onclick="specialResetRoom()" class="w-full py-1.5 rounded-xl bg-red-950 border border-red-500/50 font-titan text-[10px] text-red-200">💥 Reset Room</button>
     </div>
   </div>
 
-  <!-- GAME ARENA -->
-  <div id="arena" class="hidden flex-col h-full w-full justify-between p-2 relative overflow-hidden">
+  <!-- GAME ARENA KASINO VIP -->
+  <div id="arena" class="hidden flex-col h-full w-full justify-between p-2 relative overflow-hidden vip-table">
     
-    <!-- HEADER NAVBAR -->
-    <div class="glass-panel rounded-xl p-1.5 flex justify-between items-center text-xs font-bold flex-shrink-0 z-10">
-      <div class="flex items-center gap-1">
-        <div class="text-[11px]">Room: <span id="disp-room" class="text-amber-400 font-bold">-</span></div>
-        <button onclick="toggleTheme()" class="bg-slate-800 px-1.5 py-0.5 rounded text-[10px] border border-slate-600 ml-1">🎨</button>
+    <!-- HEADER NAVBAR ARENA -->
+    <div class="glass-panel rounded-2xl p-2 flex justify-between items-center text-xs font-bold flex-shrink-0 z-10 border border-amber-400/40">
+      <div class="flex items-center gap-1.5">
+        <div class="text-[11px]">Room: <span id="disp-room" class="text-amber-400 font-titan">-</span></div>
+        <button onclick="toggleFullscreen()" class="bg-blue-600/80 border border-blue-400 px-2 py-0.5 rounded-lg text-[10px]">🖥️</button>
       </div>
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-1.5">
         <div id="disp-turn" class="text-amber-300 font-titan text-[11px]">Menunggu...</div>
-        <div id="timer-box" class="hidden bg-red-950 border border-red-500/50 text-red-300 px-1.5 py-0.5 rounded font-titan text-[10px] animate-pulse"><span id="timer-val">15</span>s</div>
+        <div id="timer-box" class="hidden bg-red-950 border border-red-500 text-red-300 px-2 py-0.5 rounded-lg font-titan text-[10px] animate-pulse"><span id="timer-val">15</span>s</div>
       </div>
       <div class="flex items-center gap-1">
-        <button onclick="toggleModal('tracker-modal')" class="bg-emerald-700 px-1.5 py-0.5 rounded text-[10px]">📊</button>
-        <button onclick="keluarRoom()" class="bg-red-600 px-1.5 py-0.5 rounded text-[10px]">Keluar</button>
+        <button onclick="toggleModal('guide-modal')" class="bg-amber-600 px-2 py-0.5 rounded-lg text-[10px]">📖</button>
+        <button onclick="toggleModal('tracker-modal')" class="bg-emerald-700 px-2 py-0.5 rounded-lg text-[10px]">📊</button>
+        <button onclick="keluarRoom()" class="bg-red-600 px-2 py-0.5 rounded-lg text-[10px]">Keluar</button>
       </div>
     </div>
 
-    <!-- LEADERBOARD BAR & POT KOIN -->
-    <div id="leaderboard-bar" class="flex justify-around items-center bg-black/40 rounded-xl py-1 px-2 text-[10px] border border-emerald-500/20 my-1 flex-shrink-0"></div>
+    <!-- AVATAR & SEATS PEMAIN VIP (LEADERBOARD MEWAH) -->
+    <div id="seats-container" class="grid grid-cols-4 gap-1.5 my-1.5 flex-shrink-0"></div>
 
     <!-- LOBBY WAITING -->
-    <div id="lobby-waiting" class="glass-panel rounded-xl p-2 text-center my-1 flex-shrink-0 z-10">
+    <div id="lobby-waiting" class="glass-panel rounded-2xl p-3 text-center my-1 flex-shrink-0 z-10 border border-amber-400/30">
       <div class="text-[11px] text-emerald-200 mb-1">Pemain (<span id="player-count">1</span>/Max) - Mode: <span id="disp-mode" class="font-titan text-amber-400">Solo</span>:</div>
       <div id="player-list" class="flex flex-wrap justify-center gap-1 text-[10px] font-bold mb-2"></div>
-      <button id="btn-start" onclick="mulaiGameDenganBot()" class="bg-emerald-600 font-titan px-3 py-1 rounded-xl text-xs text-white shadow-lg">
-        ▶️ MULAI GAME
+      <button id="btn-start" onclick="mulaiGameDenganBot()" class="bg-gradient-to-r from-amber-500 to-yellow-400 font-titan px-4 py-1.5 rounded-xl text-xs text-slate-950 shadow-xl">
+        ▶️ MULAI GAME VIP
       </button>
     </div>
 
-    <!-- PAPAN PERMAINAN -->
-    <div id="board" class="flex-1 glass-panel rounded-xl p-2 flex flex-wrap items-center justify-center content-center gap-1 border border-emerald-600/40 shadow-inner overflow-y-auto min-h-0 my-1">
-      <div id="empty-board-msg" class="w-full text-center text-emerald-300/50 text-xs italic">Klik kartu di bawah untuk melempar.</div>
+    <!-- PAPAN PERMAINAN MEJA HIJAU KASINO -->
+    <div id="board" class="flex-1 glass-panel rounded-2xl p-3 flex flex-wrap items-center justify-center content-center gap-1 border-2 border-amber-400/30 shadow-2xl overflow-y-auto min-h-0 my-1">
+      <div id="empty-board-msg" class="w-full text-center text-amber-200/70 text-xs font-titan tracking-wide">🀏 TEKAN KARTU ANDA DI BAWAH UNTUK MEMULAI</div>
     </div>
 
-    <!-- PANEL KARTU PEMAIN (Fixed Pas Layar HP) -->
-    <div id="bottom-panel" class="glass-panel rounded-xl p-1.5 flex flex-col gap-1 flex-shrink-0 z-20 pb-2">
+    <!-- PANEL KARTU PEMAIN -->
+    <div id="bottom-panel" class="glass-panel rounded-2xl p-2 flex flex-col gap-1.5 flex-shrink-0 z-20 pb-2 border border-amber-400/40">
       <div class="flex justify-between items-center text-[11px] px-1">
-        <span id="hand-label" class="font-bold text-emerald-200">Kartu Anda (<span id="card-count">0</span>):</span>
-        <div class="flex items-center gap-1">
-          <button id="btn-draw" onclick="cangkulBatu()" class="hidden bg-yellow-500 text-slate-950 font-titan px-2 py-0.5 rounded text-[10px] animate-bounce">⛏️ CANGKUL (<span id="draw-count">0</span>)</button>
-          <button onclick="toggleModal('emote-modal')" class="bg-purple-600 text-white font-titan px-2 py-0.5 rounded text-[10px]">💬 Chat</button>
-          <button id="btn-pass" onclick="passTurn()" class="hidden bg-amber-500 text-slate-950 font-titan px-2 py-0.5 rounded text-[10px]">PASS ⏭️</button>
+        <span id="hand-label" class="font-bold text-amber-300">Kartu Anda (<span id="card-count">0</span>):</span>
+        <div class="flex items-center gap-1.5">
+          <button id="btn-draw" onclick="cangkulBatu()" class="hidden bg-gradient-to-r from-yellow-500 to-amber-400 text-slate-950 font-titan px-2.5 py-1 rounded-lg text-[10px] animate-bounce shadow-lg">⛏️ CANGKUL (<span id="draw-count">0</span>)</button>
+          <button onclick="toggleModal('emote-modal')" class="bg-purple-600 text-white font-titan px-2.5 py-1 rounded-lg text-[10px]">💬 Chat</button>
+          <button id="btn-pass" onclick="passTurn()" class="hidden bg-amber-500 text-slate-950 font-titan px-2.5 py-1 rounded-lg text-[10px]">PASS ⏭️</button>
         </div>
       </div>
-      <div id="hand" class="flex gap-1.5 overflow-x-auto custom-scroll py-1 px-1 items-center min-h-[54px]"></div>
+      <div id="hand" class="flex gap-2 overflow-x-auto custom-scroll py-1.5 px-1 items-center min-h-[82px]"></div>
     </div>
   </div>
 
@@ -231,14 +302,15 @@
 
     let myName = "", roomID = "", myID = "", roomRef = null, gameState = {}, isSpectator = false;
     let lastBoardLength = 0, turnTimerInterval = null, turnTimeLeft = 15;
-    const themes = ['theme-emerald', 'theme-blue', 'theme-ruby', 'theme-obsidian'];
-    let currentThemeIdx = 0;
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    function toggleTheme() {
-      currentThemeIdx = (currentThemeIdx + 1) % themes.length;
-      document.getElementById('app-body').className = `h-full w-full text-white flex flex-col justify-between overflow-hidden ${themes[currentThemeIdx]}`;
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => alert("Fullscreen tidak didukung browser ini."));
+      } else {
+        if (document.exitFullscreen) document.exitFullscreen();
+      }
     }
 
     function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
@@ -246,11 +318,11 @@
     function playTileSound() {
       if (audioCtx.state === 'suspended') audioCtx.resume();
       const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-      osc.type = 'triangle'; osc.frequency.setValueAtTime(180, audioCtx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.08);
-      gain.gain.setValueAtTime(1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+      osc.type = 'triangle'; osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.09);
+      gain.gain.setValueAtTime(1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.09);
       osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(); osc.stop(audioCtx.currentTime + 0.08);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.09);
     }
 
     function playPassVoice() {
@@ -262,7 +334,7 @@
       }
     }
 
-    function triggerConfetti() { if (typeof confetti === 'function') confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } }); }
+    function triggerConfetti() { if (typeof confetti === 'function') confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 } }); }
 
     function generateDeck() {
       let deck = [];
@@ -307,7 +379,7 @@
 
             if (!data.players[myID]) {
               if (Object.keys(data.players).length >= maxP) {
-                alert("Slot Room Penuh! Masuk sebagai Penonton.");
+                alert("Slot Room Penuh! Anda masuk sebagai Penonton.");
                 isSpectator = true;
               } else {
                 data.players[myID] = { name: myName, hand: [], isBot: false, coins: 1000 };
@@ -354,7 +426,7 @@
         }
 
         renderLobbyStatus();
-        renderLeaderboard();
+        renderSeatsVIP();
         renderBoard();
         renderHand();
         renderCardTracker();
@@ -375,38 +447,44 @@
       (gameState.board || []).forEach(c => { counts[c[0]]++; counts[c[1]]++; });
 
       grid.innerHTML = Object.keys(counts).map(num => `
-        <div class="flex flex-col items-center bg-slate-800/80 p-1 rounded-lg border border-slate-600">
+        <div class="flex flex-col items-center bg-slate-900/90 p-1 rounded-lg border border-emerald-500/30">
           <span class="text-amber-400 font-titan text-xs">${num}</span>
           <span class="text-[9px] text-emerald-300">${counts[num]}/7</span>
         </div>
       `).join('');
     }
 
-    function renderLeaderboard() {
-      const lb = document.getElementById('leaderboard-bar');
+    function renderSeatsVIP() {
+      const seats = document.getElementById('seats-container');
       const players = gameState.players || {};
-      const scores = gameState.scores || {};
+      const order = gameState.playerOrder || [];
+      const currentTurnID = order[gameState.currentTurnIdx];
       const pot = gameState.pot || 0;
 
-      let potHTML = `<div class="bg-amber-500/20 border border-amber-400/50 px-2 py-0.5 rounded-lg text-amber-300 font-titan text-xs">💰 POT: ${pot}</div>`;
+      let seatsHTML = `
+        <div class="col-span-4 bg-slate-950/80 rounded-xl p-1.5 border border-amber-400/50 flex justify-between items-center px-3 mb-1 shadow-md">
+          <span class="text-amber-400 font-titan text-xs flex items-center gap-1">💰 POT KASINO: <span class="text-white">${pot} Chip</span></span>
+          <span class="text-[10px] text-emerald-300 font-bold">MODE: ${gameState.mode?.toUpperCase()}</span>
+        </div>
+      `;
 
-      if (gameState.mode === 'team') {
-        let scoreA = scores['Tim A'] || 0;
-        let scoreB = scores['Tim B'] || 0;
-        lb.innerHTML = `${potHTML}
-          <div class="flex items-center gap-2">
-            <span class="text-blue-400 font-bold">TIM A: <span class="font-titan text-white">${scoreA}W</span></span>
-            <span class="text-emerald-600">|</span>
-            <span class="text-amber-400 font-bold">TIM B: <span class="font-titan text-white">${scoreB}W</span></span>
+      seatsHTML += order.map((pId, idx) => {
+        const p = players[pId];
+        if (!p) return '';
+        const isTurn = (pId === currentTurnID && gameState.status === 'playing');
+        const cardLeft = p.hand ? p.hand.length : 0;
+        let teamTag = gameState.mode === 'team' ? (idx % 2 === 0 ? ' [Tim A]' : ' [Tim B]') : '';
+
+        return `
+          <div class="flex flex-col items-center bg-slate-900/80 p-1.5 rounded-xl border ${isTurn ? 'active-turn-glow' : 'border-emerald-500/30'} text-center">
+            <span class="text-[10px] font-bold text-amber-300 truncate w-full">${p.name}${teamTag}</span>
+            <div class="text-[9px] text-emerald-200 mt-0.5 font-titan">🀏 ${cardLeft} Kartu</div>
+            <div class="text-[9px] text-yellow-400 font-bold">💰 ${p.coins || 0}</div>
           </div>
         `;
-      } else {
-        let playersHTML = Object.keys(players).map(pId => {
-          const p = players[pId]; const sc = scores[pId] || 0;
-          return `<div class="flex items-center gap-1"><span class="text-amber-300 font-bold truncate max-w-[45px]">${p.name}:</span> <span class="text-white font-titan">${sc}W (${p.coins||0}🪙)</span></div>`;
-        }).join('<span class="text-emerald-600">|</span>');
-        lb.innerHTML = `${potHTML} ${playersHTML}`;
-      }
+      }).join('');
+
+      seats.innerHTML = seatsHTML;
     }
 
     function startTurnTimer() {
@@ -452,7 +530,7 @@
     function tampilkanPengumumanMenang(winnerName, reason, showdownData, potWon) {
       document.getElementById('winner-name').innerText = `🎉 SELAMAT! ${winnerName} MENANG! 🎉`;
       document.getElementById('winner-reason').innerText = `Alasan: ${reason}`;
-      document.getElementById('winner-coins-won').innerText = `💰 Total Hadiah Sesi Ini: +${potWon} Koin Virtual!`;
+      document.getElementById('winner-coins-won').innerText = `💰 Total Hadiah Sesi Ini: +${potWon} Chip Kasino!`;
       
       const showdownBox = document.getElementById('showdown-container');
       const showdownList = document.getElementById('showdown-list');
@@ -463,7 +541,7 @@
           const isWinner = winnerName.includes(pData.name) || (gameState.mode === 'team' && winnerName.includes(pData.team));
           const cardsHTML = (pData.hand || []).map(c => createCardUI(c, false, true)).join('');
           return `
-            <div class="p-2 rounded-xl border ${isWinner ? 'bg-amber-950/60 border-amber-400' : 'bg-slate-900/80 border-slate-700'} flex flex-col gap-1">
+            <div class="p-2 rounded-xl border ${isWinner ? 'bg-amber-950/80 border-amber-400' : 'bg-slate-900/90 border-slate-700'} flex flex-col gap-1">
               <div class="flex justify-between items-center text-xs">
                 <span class="${isWinner ? 'text-amber-300 font-bold' : 'text-slate-200'}">${pData.name} ${isWinner ? '👑' : ''}</span>
                 <span class="text-[10px] font-titan text-amber-400">Total: ${pData.totalDots} Bintik</span>
@@ -495,7 +573,6 @@
       const btnStart = document.getElementById('btn-start');
       const players = gameState.players || {};
 
-      let maxP = (gameState.mode === '1v1') ? 2 : (gameState.mode === '3p' ? 3 : 4);
       document.getElementById('player-count').innerText = Object.keys(players).length;
       document.getElementById('disp-mode').innerText = gameState.mode;
       
@@ -504,7 +581,7 @@
         const p = players[pId];
         if (!p) return '';
         let teamTag = gameState.mode === 'team' ? (idx % 2 === 0 ? ' [Tim A]' : ' [Tim B]') : '';
-        return `<span class="bg-emerald-950/80 px-2 py-0.5 rounded-lg border border-emerald-500/30 text-[10px]">${p.name}${teamTag} ${p.isBot ? '🤖': ''}</span>`;
+        return `<span class="bg-emerald-950/90 px-2 py-0.5 rounded-lg border border-amber-400/40 text-[10px] text-amber-200">${p.name}${teamTag} ${p.isBot ? '🤖': ''}</span>`;
       }).join('');
 
       if (gameState.status === 'playing') waitingBox.classList.add('hidden');
@@ -708,14 +785,15 @@
     }
 
     function createCardUI(card, isHoriz = false, isMini = false) {
-      return `<div class="domino-card ${isHoriz ? 'horizontal' : ''} ${isMini ? 'mini' : ''}">${renderDotPattern(card[0])}<div class="${isHoriz ? 'domino-divider-h' : 'domino-divider-v'}"></div>${renderDotPattern(card[1])}</div>`;
+      const isBalak = (card[0] === card[1]);
+      return `<div class="domino-card ${isBalak ? 'balak' : ''} ${isHoriz ? 'horizontal' : ''} ${isMini ? 'mini' : ''}">${renderDotPattern(card[0])}<div class="${isHoriz ? 'domino-divider-h' : 'domino-divider-v'}"></div>${renderDotPattern(card[1])}</div>`;
     }
 
     function renderBoard() {
       const boardEl = document.getElementById('board');
       boardEl.innerHTML = '';
       if (!gameState.board || gameState.board.length === 0) {
-        boardEl.innerHTML = '<div id="empty-board-msg" class="w-full text-center text-emerald-300/50 text-xs italic">Klik kartu di bawah untuk melempar.</div>';
+        boardEl.innerHTML = '<div id="empty-board-msg" class="w-full text-center text-amber-200/70 text-xs font-titan tracking-wide">🀏 TEKAN KARTU ANDA DI BAWAH UNTUK MEMULAI</div>';
         return;
       }
       gameState.board.forEach(card => {
@@ -732,11 +810,11 @@
       handEl.innerHTML = '';
 
       if (isSpectator) {
-        handLabel.innerHTML = `<span class="font-bold text-amber-300">📊 MONITOR JURI:</span>`;
+        handLabel.innerHTML = `<span class="font-bold text-amber-300">📊 MONITOR PENONTON / JURI:</span>`;
         Object.values(gameState.players || {}).forEach(p => {
           const pBox = document.createElement('div');
-          pBox.className = "flex flex-col items-center bg-emerald-950/80 p-1 rounded-lg border border-emerald-500/30 text-[9px] min-w-[55px]";
-          pBox.innerHTML = `<span class="font-bold text-amber-200 truncate max-w-[50px]">${p.name}</span><span class="text-xs font-titan text-white">${p.hand ? p.hand.length : 0} Kartu</span>`;
+          pBox.className = "flex flex-col items-center bg-slate-900/90 p-2 rounded-xl border border-amber-400/40 text-[10px] min-w-[65px]";
+          pBox.innerHTML = `<span class="font-bold text-amber-300 truncate max-w-[60px]">${p.name}</span><span class="text-xs font-titan text-white">${p.hand ? p.hand.length : 0} Kartu</span>`;
           handEl.appendChild(pBox);
         });
         return;
