@@ -13,7 +13,16 @@
 
   <style>
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-    html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; font-family: 'Fredoka', sans-serif; background: #061e12; }
+    html, body { 
+      height: 100%; 
+      height: 100dvh; 
+      width: 100%; 
+      margin: 0; 
+      padding: 0; 
+      overflow: hidden; 
+      font-family: 'Fredoka', sans-serif; 
+      background: #061e12; 
+    }
     .font-titan { font-family: 'Titan One', cursive; }
 
     .theme-emerald { background: radial-gradient(circle, #0c3823 0%, #04120b 100%); }
@@ -21,47 +30,58 @@
     .theme-ruby { background: radial-gradient(circle, #480f1a 0%, #180407 100%); }
     .theme-obsidian { background: radial-gradient(circle, #222226 0%, #0a0a0c 100%); }
 
-    /* Ukuran kartu disesuaikan agar pas di HP */
+    /* Kartu Tangan Vertikal */
     .domino-card {
-      width: clamp(28px, 6vw, 38px); height: clamp(50px, 10vw, 68px);
-      background: #fdfbf7; border: 1.5px solid #1a1a1a; border-radius: 5px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.4); display: flex; flex-direction: column;
-      justify-content: space-between; align-items: center; padding: 2px;
-      cursor: grab; transition: transform 0.15s; flex-shrink: 0;
+      width: clamp(26px, 7vw, 36px);
+      height: clamp(48px, 13vw, 64px);
+      background: #fdfbf7; 
+      border: 1.5px solid #1a1a1a; 
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.4); 
+      display: flex; 
+      flex-direction: column;
+      justify-content: space-between; 
+      align-items: center; 
+      padding: 2px;
+      cursor: pointer; 
+      flex-shrink: 0;
     }
-    .domino-card:active { transform: scale(1.05); }
-    .domino-card.mini { width: 20px; height: 34px; border-width: 1px; padding: 1px; border-radius: 3px; }
+    .domino-card:active { transform: scale(1.08); }
+    .domino-card.mini { width: 18px; height: 32px; border-width: 1px; padding: 1px; border-radius: 3px; }
 
+    /* Kartu Meja Horizontal */
     .domino-card.horizontal {
-      width: clamp(34px, 7vw, 54px); height: clamp(20px, 4vw, 30px);
-      flex-direction: row; border-width: 1px; border-radius: 4px; padding: 1px;
+      width: clamp(42px, 11vw, 56px); 
+      height: clamp(24px, 6vw, 32px);
+      flex-direction: row; 
+      border-width: 1.5px; 
+      border-radius: 4px; 
+      padding: 2px;
     }
 
     .domino-divider-v { width: 100%; height: 1.5px; background: #333; margin: 1px 0; }
     .domino-divider-h { height: 100%; width: 1.5px; background: #333; margin: 0 1px; }
 
     .dot-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 100%; height: 100%; place-items: center; }
-    .dot { width: clamp(2.5px, 0.8vw, 4.5px); height: clamp(2.5px, 0.8vw, 4.5px); background-color: #111; border-radius: 50%; }
+    .dot { width: clamp(2.5px, 0.9vw, 4px); height: clamp(2.5px, 0.9vw, 4px); background-color: #111; border-radius: 50%; }
     .domino-card.mini .dot { width: 2px; height: 2px; }
 
     .glass-panel { background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); }
-
-    /* Scrollbar halus untuk deck kartu HP */
-    .custom-scroll::-webkit-scrollbar { height: 4px; }
+    .custom-scroll::-webkit-scrollbar { height: 3px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, 0.5); border-radius: 4px; }
   </style>
 </head>
 <body id="app-body" class="h-full w-full text-white flex flex-col justify-between overflow-hidden theme-emerald">
 
-  <!-- MODAL QUICK CHAT -->
+  <!-- MODAL EMOTE -->
   <div id="emote-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
     <div class="glass-panel rounded-2xl p-4 w-full max-w-xs text-center border border-amber-400/50">
       <div class="font-titan text-sm text-amber-400 mb-3">KIRIM EKSPRESI 💬</div>
       <div class="grid grid-cols-2 gap-2 mb-3">
-        <button onclick="kirimEmote('🤣 Wkwkwk!')" class="py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold border border-slate-600">🤣 Wkwkwk!</button>
-        <button onclick="kirimEmote('😱 Aduhh Gaple!')" class="py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold border border-slate-600">😱 Aduhh Gaple!</button>
-        <button onclick="kirimEmote('⚡ Buru-Buru Amat!')" class="py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold border border-slate-600">⚡ Buru-Buru Amat!</button>
-        <button onclick="kirimEmote('🔥 Yakin Menang!')" class="py-2 bg-slate-800 hover:bg-slate-700 rounded-lg text-xs font-bold border border-slate-600">🔥 Yakin Menang!</button>
+        <button onclick="kirimEmote('🤣 Wkwkwk!')" class="py-2 bg-slate-800 rounded-lg text-xs font-bold border border-slate-600">🤣 Wkwkwk!</button>
+        <button onclick="kirimEmote('😱 Aduhh Gaple!')" class="py-2 bg-slate-800 rounded-lg text-xs font-bold border border-slate-600">😱 Aduhh Gaple!</button>
+        <button onclick="kirimEmote('⚡ Buru-Buru!')" class="py-2 bg-slate-800 rounded-lg text-xs font-bold border border-slate-600">⚡ Buru-Buru!</button>
+        <button onclick="kirimEmote('🔥 Yakin Menang!')" class="py-2 bg-slate-800 rounded-lg text-xs font-bold border border-slate-600">🔥 Yakin Menang!</button>
       </div>
       <button onclick="toggleModal('emote-modal')" class="w-full py-1.5 bg-red-600 rounded-xl text-xs font-titan">TUTUP</button>
     </div>
@@ -80,15 +100,15 @@
   <div id="choice-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
     <div class="glass-panel rounded-2xl p-5 w-full max-w-xs text-center border border-amber-400">
       <div class="font-titan text-lg text-amber-400 mb-2">PILIH SISI PAPAN 🧩</div>
-      <p class="text-xs text-emerald-200 mb-4">Kartu Anda cocok di kedua ujung papan. Dipasang di mana?</p>
+      <p class="text-xs text-emerald-200 mb-4">Kartu Anda cocok di kedua ujung. Dipasang di mana?</p>
       <div class="flex gap-2">
-        <button id="btn-choice-left" class="w-1/2 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 font-titan text-xs text-white">⬅️ KIRI</button>
-        <button id="btn-choice-right" class="w-1/2 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-titan text-xs text-slate-950">KANAN ➡️</button>
+        <button id="btn-choice-left" class="w-1/2 py-2 rounded-xl bg-blue-600 font-titan text-xs text-white">⬅️ KIRI</button>
+        <button id="btn-choice-right" class="w-1/2 py-2 rounded-xl bg-amber-500 font-titan text-xs text-slate-950">KANAN ➡️</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL WINNER & SHOWDOWN -->
+  <!-- MODAL WINNER -->
   <div id="winner-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 overflow-y-auto">
     <div class="glass-panel rounded-3xl p-4 w-full max-w-sm text-center border-2 border-amber-400 my-auto shadow-2xl">
       <div class="text-4xl mb-1">🏆🎉</div>
@@ -101,7 +121,7 @@
         <div id="showdown-list" class="flex flex-col gap-2"></div>
       </div>
 
-      <button onclick="tutupModalDanLanjut()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-titan text-slate-950 text-xs shadow-lg">
+      <button onclick="tutupModalDanLanjut()" class="w-full py-2.5 rounded-xl bg-amber-500 font-titan text-slate-950 text-xs shadow-lg">
         LANJUT / LOBBY 🚀
       </button>
     </div>
@@ -124,13 +144,13 @@
         </select>
       </div>
 
-      <button onclick="masukRoom(false)" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-titan text-xs text-slate-950 shadow-lg mb-2">
+      <button onclick="masukRoom(false)" class="w-full py-2.5 rounded-xl bg-amber-500 font-titan text-xs text-slate-950 shadow-lg mb-2">
         MASUK PEMAIN 🚀
       </button>
-      <button onclick="masukRoom(true)" class="w-full py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 font-titan text-xs text-white shadow-lg mb-2">
+      <button onclick="masukRoom(true)" class="w-full py-2 rounded-xl bg-blue-600 font-titan text-xs text-white shadow-lg mb-2">
         👁️ JADI JURI / PENONTON
       </button>
-      <button onclick="specialResetRoom()" class="w-full py-1.5 rounded-xl bg-gradient-to-r from-red-800 to-red-900 border border-red-500/40 font-titan text-[10px] text-red-200">💥 Reset Room</button>
+      <button onclick="specialResetRoom()" class="w-full py-1.5 rounded-xl bg-red-900 border border-red-500/40 font-titan text-[10px] text-red-200">💥 Reset Room</button>
     </div>
   </div>
 
@@ -138,29 +158,29 @@
   <div id="arena" class="hidden flex-col h-full w-full justify-between p-2 relative overflow-hidden">
     
     <!-- HEADER NAVBAR -->
-    <div class="glass-panel rounded-xl p-2 flex justify-between items-center text-xs font-bold flex-shrink-0 z-10">
+    <div class="glass-panel rounded-xl p-1.5 flex justify-between items-center text-xs font-bold flex-shrink-0 z-10">
       <div class="flex items-center gap-1">
-        <div>Room: <span id="disp-room" class="text-amber-400">-</span></div>
-        <button onclick="toggleTheme()" class="bg-slate-800 px-2 py-0.5 rounded text-[10px] border border-slate-600 ml-1">🎨</button>
+        <div class="text-[11px]">Room: <span id="disp-room" class="text-amber-400 font-bold">-</span></div>
+        <button onclick="toggleTheme()" class="bg-slate-800 px-1.5 py-0.5 rounded text-[10px] border border-slate-600 ml-1">🎨</button>
       </div>
-      <div class="flex items-center gap-1.5">
+      <div class="flex items-center gap-1">
         <div id="disp-turn" class="text-amber-300 font-titan text-[11px]">Menunggu...</div>
         <div id="timer-box" class="hidden bg-red-950 border border-red-500/50 text-red-300 px-1.5 py-0.5 rounded font-titan text-[10px] animate-pulse"><span id="timer-val">15</span>s</div>
       </div>
       <div class="flex items-center gap-1">
-        <button onclick="toggleModal('tracker-modal')" class="bg-emerald-700 px-2 py-0.5 rounded text-[10px]">📊</button>
-        <button onclick="keluarRoom()" class="bg-red-600 px-2 py-0.5 rounded text-[10px]">Keluar</button>
+        <button onclick="toggleModal('tracker-modal')" class="bg-emerald-700 px-1.5 py-0.5 rounded text-[10px]">📊</button>
+        <button onclick="keluarRoom()" class="bg-red-600 px-1.5 py-0.5 rounded text-[10px]">Keluar</button>
       </div>
     </div>
 
     <!-- LEADERBOARD BAR -->
-    <div id="leaderboard-bar" class="flex justify-around items-center bg-black/40 rounded-xl py-1 px-2 text-[10px] border border-emerald-500/20 my-1 flex-shrink-0 relative"></div>
+    <div id="leaderboard-bar" class="flex justify-around items-center bg-black/40 rounded-xl py-1 px-2 text-[10px] border border-emerald-500/20 my-1 flex-shrink-0"></div>
 
     <!-- LOBBY WAITING -->
     <div id="lobby-waiting" class="glass-panel rounded-xl p-2 text-center my-1 flex-shrink-0 z-10">
       <div class="text-[11px] text-emerald-200 mb-1">Pemain (<span id="player-count">1</span>/4) - Mode: <span id="disp-mode" class="font-titan text-amber-400">Solo</span>:</div>
       <div id="player-list" class="flex flex-wrap justify-center gap-1 text-[10px] font-bold mb-2"></div>
-      <button id="btn-start" onclick="mulaiGameDenganBot()" class="bg-gradient-to-r from-emerald-500 to-green-600 font-titan px-3 py-1 rounded-xl text-xs text-white shadow-lg">
+      <button id="btn-start" onclick="mulaiGameDenganBot()" class="bg-emerald-600 font-titan px-3 py-1 rounded-xl text-xs text-white shadow-lg">
         ▶️ MULAI GAME
       </button>
     </div>
@@ -170,8 +190,8 @@
       <div id="empty-board-msg" class="w-full text-center text-emerald-300/50 text-xs italic">Klik kartu di bawah untuk melempar.</div>
     </div>
 
-    <!-- PANEL KARTU PEMAIN (Pasti Muncul di Layar HP) -->
-    <div id="bottom-panel" class="glass-panel rounded-xl p-2 flex flex-col gap-1 flex-shrink-0 z-20">
+    <!-- PANEL KARTU PEMAIN (Fixed Pas Layar HP) -->
+    <div id="bottom-panel" class="glass-panel rounded-xl p-1.5 flex flex-col gap-1 flex-shrink-0 z-20 pb-2">
       <div class="flex justify-between items-center text-[11px] px-1">
         <span id="hand-label" class="font-bold text-emerald-200">Kartu Anda (<span id="card-count">0</span>):</span>
         <div class="flex items-center gap-1">
@@ -179,7 +199,7 @@
           <button id="btn-pass" onclick="passTurn()" class="hidden bg-amber-500 text-slate-950 font-titan px-2 py-0.5 rounded text-[10px]">PASS ⏭️</button>
         </div>
       </div>
-      <div id="hand" class="flex gap-1.5 overflow-x-auto custom-scroll py-1 px-0.5 items-center min-h-[58px]"></div>
+      <div id="hand" class="flex gap-1.5 overflow-x-auto custom-scroll py-1 px-1 items-center min-h-[54px]"></div>
     </div>
   </div>
 
@@ -248,8 +268,6 @@
       if (!code) return alert("Masukkan Kode Room!");
 
       isSpectator = spectatorMode; roomID = "domino_" + code;
-      
-      // Menggunakan Nama yang dibersihkan sebagai ID KONTINU agar tidak pernah kehilangan kartu
       let cleanID = myName.toLowerCase().replace(/[^a-z0-9]/g, '');
       myID = (isSpectator ? "spec_" : "p_") + cleanID;
       
@@ -271,7 +289,6 @@
             if (!data.playerOrder) data.playerOrder = [];
             if (!data.scores) data.scores = {};
 
-            // Masuk kembali atau tambahkan pemain baru
             if (!data.players[myID]) {
               if (Object.keys(data.players).length >= 4) {
                 alert("Slot Penuh! Masuk sebagai penonton/juri.");
@@ -464,12 +481,10 @@
       let order = [];
       let scores = gameState.scores || {};
 
-      // Masukkan semua pemain manusia aktif
       Object.keys(players).forEach(pId => {
         if (!players[pId].isBot) order.push(pId);
       });
 
-      // Tambahkan Bot hingga total 4 pemain
       let botNum = 1;
       while (order.length < 4) {
         let botID = "bot_" + botNum;
@@ -478,7 +493,6 @@
         botNum++;
       }
 
-      // Bagikan 7 kartu ke setiap ID pemain
       order.forEach(pId => {
         players[pId].hand = deck.splice(0, 7);
       });
@@ -624,8 +638,8 @@
         handLabel.innerHTML = `<span class="font-bold text-amber-300">📊 MONITOR JURI:</span>`;
         Object.values(gameState.players || {}).forEach(p => {
           const pBox = document.createElement('div');
-          pBox.className = "flex flex-col items-center bg-emerald-950/80 p-1 rounded-lg border border-emerald-500/30 text-[9px] min-w-[60px]";
-          pBox.innerHTML = `<span class="font-bold text-amber-200 truncate max-w-[55px]">${p.name}</span><span class="text-xs font-titan text-white">${p.hand ? p.hand.length : 0} Kartu</span>`;
+          pBox.className = "flex flex-col items-center bg-emerald-950/80 p-1 rounded-lg border border-emerald-500/30 text-[9px] min-w-[55px]";
+          pBox.innerHTML = `<span class="font-bold text-amber-200 truncate max-w-[50px]">${p.name}</span><span class="text-xs font-titan text-white">${p.hand ? p.hand.length : 0} Kartu</span>`;
           handEl.appendChild(pBox);
         });
         return;
@@ -636,7 +650,7 @@
 
       myHand.forEach((card, idx) => {
         const wrapper = document.createElement('div');
-        wrapper.className = "flex-shrink-0 cursor-pointer active:scale-105 transition-transform";
+        wrapper.className = "flex-shrink-0 cursor-pointer";
         wrapper.innerHTML = createCardUI(card, false);
         wrapper.onclick = () => mainkanKartu(card, idx);
         handEl.appendChild(wrapper);
