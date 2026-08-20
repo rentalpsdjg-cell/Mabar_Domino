@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Domino Gaple Ultimate - Adu Batu Edition</title>
+  <title>Domino Gaple Ultimate - Mode Tim 2 vs 2</title>
   
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -21,7 +21,6 @@
     .theme-ruby { background: radial-gradient(circle, #480f1a 0%, #180407 100%); }
     .theme-obsidian { background: radial-gradient(circle, #222226 0%, #0a0a0c 100%); }
 
-    /* Kartu Normal Tangan */
     .domino-card {
       width: clamp(24px, 4.5vw, 36px); height: clamp(44px, 8vw, 64px);
       background: #fdfbf7; border: 1.5px solid #1a1a1a; border-radius: 4px;
@@ -32,12 +31,8 @@
     .domino-card:active { cursor: grabbing; transform: scale(1.08); }
     .domino-card.dragging { opacity: 0.5; }
     
-    /* Kartu Kecil Khusus Pop-Up Adu Batu */
-    .domino-card.mini {
-      width: 18px; height: 32px; border-width: 1px; padding: 1px; border-radius: 2px;
-    }
+    .domino-card.mini { width: 18px; height: 32px; border-width: 1px; padding: 1px; border-radius: 2px; }
 
-    /* Kartu Papan Meja */
     .domino-card.horizontal {
       width: clamp(32px, 5.5vw, 52px); height: clamp(18px, 3.2vw, 28px);
       flex-direction: row; border-width: 1px; border-radius: 3px; padding: 1px; cursor: default;
@@ -81,7 +76,7 @@
     </div>
   </div>
 
-  <!-- MODAL PILIHAN SISI (KIRI / KANAN) -->
+  <!-- MODAL PILIHAN SISI -->
   <div id="choice-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
     <div class="glass-panel rounded-2xl p-5 w-full max-w-xs text-center border border-amber-400">
       <div class="font-titan text-lg text-amber-400 mb-2">PILIH SISI PAPAN 🧩</div>
@@ -93,7 +88,7 @@
     </div>
   </div>
 
-  <!-- MODAL WINNER & SHOWDOWN (ADU BATU SISA KARTU) -->
+  <!-- MODAL WINNER & SHOWDOWN -->
   <div id="winner-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 overflow-y-auto">
     <div class="glass-panel rounded-3xl p-4 w-full max-w-sm text-center border-2 border-amber-400 my-auto shadow-2xl">
       <div class="text-4xl mb-1">🏆🎉</div>
@@ -101,9 +96,8 @@
       <div id="winner-name" class="text-sm font-bold text-white mb-1">Pemain Menang!</div>
       <div id="winner-reason" class="text-[11px] text-emerald-300 italic mb-3">Kartu Habis</div>
 
-      <!-- BOARD TRANSPARANSI ADU BATU -->
       <div id="showdown-container" class="hidden bg-slate-950/80 rounded-2xl p-2.5 border border-slate-700/80 mb-4 text-left max-h-[45vh] overflow-y-auto">
-        <div class="font-titan text-center text-xs text-amber-300 mb-2 border-b border-slate-800 pb-1">⚡ HASIL ADU BATU / GAPLE ⚡</div>
+        <div class="font-titan text-center text-xs text-amber-300 mb-2 border-b border-slate-800 pb-1">⚡ HASIL SISA KARTU PEMAIN ⚡</div>
         <div id="showdown-list" class="flex flex-col gap-2"></div>
       </div>
 
@@ -113,14 +107,23 @@
     </div>
   </div>
 
-  <!-- LOBBY MAIN MENU -->
+  <!-- LOBBY MAIN MENU (UTUH & DITAMBAH MODE SELECTION) -->
   <div id="lobby" class="fixed inset-0 z-40 flex items-center justify-center p-3 bg-gradient-to-br from-emerald-950 via-green-950 to-black">
     <div class="glass-panel rounded-3xl p-4 sm:p-6 w-full max-w-xs sm:max-w-sm text-center border border-emerald-500/30">
       <div class="font-titan text-2xl sm:text-3xl text-amber-400 mb-1">🀏 GAPLE ULTIMATE</div>
-      <p class="text-[11px] text-emerald-200/80 mb-3">Fitur Transparansi Adu Batu Sisa Kartu</p>
+      <p class="text-[11px] text-emerald-200/80 mb-3">Pilih Mode Individu atau Mode Tim (2 vs 2)</p>
 
       <input type="text" id="player-name" placeholder="Nama Anda" class="w-full py-2 px-3 rounded-xl bg-slate-900/90 border border-emerald-500/50 text-white font-bold text-center text-xs mb-2 outline-none focus:border-amber-400">
-      <input type="number" id="room-code" placeholder="Kode Room (cth: 888)" class="w-full py-2 px-3 rounded-xl bg-slate-900/90 border border-emerald-500/50 text-white font-bold text-center text-xs mb-3 outline-none focus:border-amber-400">
+      <input type="number" id="room-code" placeholder="Kode Room (cth: 888)" class="w-full py-2 px-3 rounded-xl bg-slate-900/90 border border-emerald-500/50 text-white font-bold text-center text-xs mb-2 outline-none focus:border-amber-400">
+
+      <!-- PILIHAN MODE GAME (BARU) -->
+      <div class="flex items-center justify-between bg-slate-900/80 p-1.5 rounded-xl border border-emerald-500/40 mb-3">
+        <span class="text-[11px] font-bold text-emerald-200 pl-2">Mode Game:</span>
+        <select id="game-mode" class="bg-emerald-950 text-amber-300 font-titan text-xs py-1 px-2 rounded-lg outline-none border border-emerald-600">
+          <option value="solo">👤 Solo (1v1v1v1)</option>
+          <option value="team">👥 Tim (2 vs 2)</option>
+        </select>
+      </div>
 
       <button onclick="masukRoom(false)" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-titan text-xs sm:text-sm text-slate-950 shadow-lg mb-2">
         MASUK PEMAIN 🚀
@@ -156,7 +159,7 @@
     <div id="leaderboard-bar" class="flex justify-around items-center bg-black/40 rounded-xl py-1 px-2 text-[10px] border border-emerald-500/20 flex-shrink-0 relative"></div>
 
     <div id="lobby-waiting" class="glass-panel rounded-xl p-2 text-center my-1 flex-shrink-0">
-      <div class="text-[11px] text-emerald-200 mb-1">Pemain Terhubung (<span id="player-count">1</span>/4):</div>
+      <div class="text-[11px] text-emerald-200 mb-1">Pemain Terhubung (<span id="player-count">1</span>/4) - Mode: <span id="disp-mode" class="font-titan text-amber-400">Solo</span>:</div>
       <div id="player-list" class="flex flex-wrap justify-center gap-1 text-[11px] font-bold mb-2"></div>
       <button id="btn-start" onclick="mulaiGameDenganBot()" class="bg-gradient-to-r from-emerald-500 to-green-600 font-titan px-3 py-1.5 rounded-xl text-xs text-white shadow-lg">
         ▶️ MULAI GAME (Sisa Slot Bot)
@@ -243,6 +246,7 @@
       if (audioCtx.state === 'suspended') audioCtx.resume();
       myName = document.getElementById('player-name').value.trim() || (spectatorMode ? "Juri" : "Pemain");
       const code = document.getElementById('room-code').value.trim();
+      const modeSelected = document.getElementById('game-mode').value;
       if (!code) return alert("Masukkan kode room!");
 
       isSpectator = spectatorMode; roomID = "domino_" + code;
@@ -257,6 +261,7 @@
         let data = snapshot.val();
         if (!data) {
           data = {
+            mode: modeSelected,
             players: isSpectator ? {} : { [myID]: { name: myName, hand: [], isBot: false } },
             spectators: isSpectator ? { [myID]: { name: myName } } : {},
             playerOrder: isSpectator ? [] : [myID], currentTurnIdx: 0, board: [], leftVal: -1, rightVal: -1, status: "waiting", host: isSpectator ? "" : myID, consecutivePasses: 0, scores: isSpectator ? {} : { [myID]: 0 }
@@ -355,10 +360,22 @@
       const players = gameState.players || {};
       const scores = gameState.scores || {};
 
-      lb.innerHTML = Object.keys(players).map(pId => {
-        const p = players[pId]; const sc = scores[pId] || 0;
-        return `<div class="flex items-center gap-1"><span class="text-amber-300 font-bold truncate max-w-[50px]">${p.name}:</span> <span class="text-white font-titan">${sc}W</span></div>`;
-      }).join('<span class="text-emerald-600">|</span>');
+      if (gameState.mode === 'team') {
+        let scoreA = scores['Tim A'] || 0;
+        let scoreB = scores['Tim B'] || 0;
+        lb.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="text-blue-400 font-bold">TIM A (P1 & P3): <span class="font-titan text-white">${scoreA}W</span></span>
+            <span class="text-emerald-600">|</span>
+            <span class="text-amber-400 font-bold">TIM B (P2 & P4): <span class="font-titan text-white">${scoreB}W</span></span>
+          </div>
+        `;
+      } else {
+        lb.innerHTML = Object.keys(players).map(pId => {
+          const p = players[pId]; const sc = scores[pId] || 0;
+          return `<div class="flex items-center gap-1"><span class="text-amber-300 font-bold truncate max-w-[50px]">${p.name}:</span> <span class="text-white font-titan">${sc}W</span></div>`;
+        }).join('<span class="text-emerald-600">|</span>');
+      }
     }
 
     function startTurnTimer() {
@@ -383,7 +400,6 @@
       }, 1000);
     }
 
-    /* MENAMPILKAN SISA KARTU SEMUA PEMAIN SAAT ADU BATU */
     function tampilkanPengumumanMenang(winnerName, reason, showdownData) {
       document.getElementById('winner-name').innerText = `🎉 SELAMAT! ${winnerName} MENANG! 🎉`;
       document.getElementById('winner-reason').innerText = `Alasan: ${reason}`;
@@ -394,12 +410,12 @@
       if (showdownData && showdownData.length > 0) {
         showdownBox.classList.remove('hidden');
         showdownList.innerHTML = showdownData.map(pData => {
-          const isWinner = pData.name === winnerName;
+          const isWinner = winnerName.includes(pData.name) || (gameState.mode === 'team' && winnerName.includes(pData.team));
           const cardsHTML = (pData.hand || []).map(c => createCardUI(c, false, true)).join('');
           return `
             <div class="p-2 rounded-xl border ${isWinner ? 'bg-amber-950/60 border-amber-400' : 'bg-slate-900/80 border-slate-700'} flex flex-col gap-1">
               <div class="flex justify-between items-center text-xs">
-                <span class="${isWinner ? 'text-amber-300 font-bold' : 'text-slate-200'}">${pData.name} ${isWinner ? '👑' : ''}</span>
+                <span class="${isWinner ? 'text-amber-300 font-bold' : 'text-slate-200'}">${pData.name} ${gameState.mode === 'team' ? `(${pData.team})` : ''} ${isWinner ? '👑' : ''}</span>
                 <span class="text-[11px] font-titan ${isWinner ? 'text-amber-400' : 'text-emerald-400'}">Total Bintik: ${pData.totalDots}</span>
               </div>
               <div class="flex flex-wrap gap-1 items-center mt-1">
@@ -420,14 +436,26 @@
       document.getElementById('winner-modal').classList.add('hidden');
       if (roomRef && (gameState.host === myID || gameState.playerOrder?.[0] === myID)) {
         let scores = gameState.scores || {};
-        let winnerID = Object.keys(gameState.players).find(id => gameState.players[id].name === gameState.winnerName);
-        if (winnerID) scores[winnerID] = (scores[winnerID] || 0) + 1;
-
-        if (winnerID && scores[winnerID] >= 3) {
-          alert(`🏆 ${gameState.winnerName} JUARA UTAMA (3x Menang)! Room di-reset.`);
-          roomRef.update({ status: "waiting", board: [], leftVal: -1, rightVal: -1, winnerName: null, showdownData: null, scores: {} });
+        
+        if (gameState.mode === 'team') {
+          let winTeam = gameState.winnerName.includes('TIM A') ? 'Tim A' : 'Tim B';
+          scores[winTeam] = (scores[winTeam] || 0) + 1;
+          if (scores[winTeam] >= 3) {
+            alert(`🏆 ${winTeam} JUARA UTAMA (3x Menang)! Room di-reset.`);
+            roomRef.update({ status: "waiting", board: [], leftVal: -1, rightVal: -1, winnerName: null, showdownData: null, scores: {} });
+          } else {
+            roomRef.update({ status: "waiting", board: [], leftVal: -1, rightVal: -1, winnerName: null, showdownData: null, scores });
+          }
         } else {
-          roomRef.update({ status: "waiting", board: [], leftVal: -1, rightVal: -1, winnerName: null, showdownData: null, scores });
+          let winnerID = Object.keys(gameState.players).find(id => gameState.players[id].name === gameState.winnerName);
+          if (winnerID) scores[winnerID] = (scores[winnerID] || 0) + 1;
+
+          if (winnerID && scores[winnerID] >= 3) {
+            alert(`🏆 ${gameState.winnerName} JUARA UTAMA (3x Menang)! Room di-reset.`);
+            roomRef.update({ status: "waiting", board: [], leftVal: -1, rightVal: -1, winnerName: null, showdownData: null, scores: {} });
+          } else {
+            roomRef.update({ status: "waiting", board: [], leftVal: -1, rightVal: -1, winnerName: null, showdownData: null, scores });
+          }
         }
       }
       keluarRoom();
@@ -440,7 +468,15 @@
       const players = gameState.players || {};
 
       document.getElementById('player-count').innerText = Object.keys(players).length;
-      pList.innerHTML = Object.values(players).map(p => `<span class="bg-emerald-950/80 px-2 py-0.5 rounded-lg border border-emerald-500/30 text-[10px]">${p.name} ${p.isBot ? '🤖': ''}</span>`).join('');
+      document.getElementById('disp-mode').innerText = gameState.mode === 'team' ? '👥 Tim (2 vs 2)' : '👤 Solo';
+      
+      const order = gameState.playerOrder || [];
+      pList.innerHTML = order.map((pId, idx) => {
+        const p = players[pId];
+        if (!p) return '';
+        let teamTag = gameState.mode === 'team' ? (idx % 2 === 0 ? ' [Tim A]' : ' [Tim B]') : '';
+        return `<span class="bg-emerald-950/80 px-2 py-0.5 rounded-lg border border-emerald-500/30 text-[10px]">${p.name}${teamTag} ${p.isBot ? '🤖': ''}</span>`;
+      }).join('');
 
       if (gameState.status === 'playing') waitingBox.classList.add('hidden');
       else {
@@ -459,7 +495,6 @@
       while (order.length < 4) {
         let botID = "bot_" + botCount;
         players[botID] = { name: "Bot " + botCount, hand: [], isBot: true };
-        scores[botID] = scores[botID] || 0;
         order.push(botID); botCount++;
       }
 
@@ -523,35 +558,53 @@
       if (passes >= gameState.playerOrder.length) return hitungKemenanganGaple();
 
       if (botHand.length === 0) {
-        return roomRef.update({ board, status: "finished", winnerName: gameState.players[botID].name, winReason: "Kartu Habis!" });
+        let winnerName = gameState.players[botID].name;
+        if (gameState.mode === 'team') {
+          let pIdx = gameState.playerOrder.indexOf(botID);
+          winnerName = pIdx % 2 === 0 ? "TIM A (P1 & P3)" : "TIM B (P2 & P4)";
+        }
+        return roomRef.update({ board, status: "finished", winnerName, winReason: "Kartu Habis!" });
       }
 
       let nextTurn = (gameState.currentTurnIdx + 1) % gameState.playerOrder.length;
       roomRef.update({ board, leftVal: left, rightVal: right, [`players/${botID}/hand`]: botHand, currentTurnIdx: nextTurn, consecutivePasses: passes });
     }
 
-    /* MENGHITUNG KARTU DAN MEMBUAT DATA TRANSPARANSI ADU BATU */
     function hitungKemenanganGaple() {
-      let minDots = 999, winnerName = "Tidak Ada";
       let showdownData = [];
+      let order = gameState.playerOrder || [];
 
-      Object.values(gameState.players || {}).forEach(p => {
+      order.forEach((pId, idx) => {
+        let p = gameState.players[pId];
         let totalDots = (p.hand || []).reduce((sum, c) => sum + c[0] + c[1], 0);
-        showdownData.push({ name: p.name, hand: p.hand || [], totalDots });
-
-        if (totalDots < minDots) {
-          minDots = totalDots;
-          winnerName = p.name;
-        }
+        let team = idx % 2 === 0 ? 'Tim A' : 'Tim B';
+        showdownData.push({ name: p.name, hand: p.hand || [], totalDots, team });
       });
 
-      // Urutkan showdownData dari bintik terkecil
-      showdownData.sort((a, b) => a.totalDots - b.totalDots);
+      let winnerName = "Tidak Ada";
+      let winReason = "";
+
+      if (gameState.mode === 'team') {
+        let dotsTeamA = showdownData.filter(d => d.team === 'Tim A').reduce((s, d) => s + d.totalDots, 0);
+        let dotsTeamB = showdownData.filter(d => d.team === 'Tim B').reduce((s, d) => s + d.totalDots, 0);
+
+        if (dotsTeamA < dotsTeamB) {
+          winnerName = "TIM A (P1 & P3)";
+          winReason = `GAPLE TIM! Bintik Tim A (${dotsTeamA}) < Tim B (${dotsTeamB})`;
+        } else {
+          winnerName = "TIM B (P2 & P4)";
+          winReason = `GAPLE TIM! Bintik Tim B (${dotsTeamB}) < Tim A (${dotsTeamA})`;
+        }
+      } else {
+        showdownData.sort((a, b) => a.totalDots - b.totalDots);
+        winnerName = showdownData[0].name;
+        winReason = `GAPLE! (Bintik Terkecil: ${showdownData[0].totalDots})`;
+      }
 
       roomRef.update({
         status: "finished",
         winnerName,
-        winReason: `GAPLE / ADU BATU! (Bintik Terkecil: ${minDots})`,
+        winReason,
         showdownData
       });
     }
@@ -675,7 +728,12 @@
       myHand.splice(idx, 1);
 
       if (myHand.length === 0) {
-        return roomRef.update({ board, status: "finished", winnerName: myName, winReason: "Kartu Habis!", [`players/${myID}/hand`]: [] });
+        let winnerName = myName;
+        if (gameState.mode === 'team') {
+          let pIdx = gameState.playerOrder.indexOf(myID);
+          winnerName = pIdx % 2 === 0 ? "TIM A (P1 & P3)" : "TIM B (P2 & P4)";
+        }
+        return roomRef.update({ board, status: "finished", winnerName, winReason: "Kartu Habis!", [`players/${myID}/hand`]: [] });
       }
 
       let nextTurn = (gameState.currentTurnIdx + 1) % gameState.playerOrder.length;
