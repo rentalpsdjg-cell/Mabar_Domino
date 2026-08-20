@@ -107,7 +107,7 @@
     </div>
   </div>
 
-  <!-- LOBBY MAIN MENU (UTUH & DITAMBAH MODE SELECTION) -->
+  <!-- LOBBY MAIN MENU -->
   <div id="lobby" class="fixed inset-0 z-40 flex items-center justify-center p-3 bg-gradient-to-br from-emerald-950 via-green-950 to-black">
     <div class="glass-panel rounded-3xl p-4 sm:p-6 w-full max-w-xs sm:max-w-sm text-center border border-emerald-500/30">
       <div class="font-titan text-2xl sm:text-3xl text-amber-400 mb-1">🀏 GAPLE ULTIMATE</div>
@@ -116,7 +116,6 @@
       <input type="text" id="player-name" placeholder="Nama Anda" class="w-full py-2 px-3 rounded-xl bg-slate-900/90 border border-emerald-500/50 text-white font-bold text-center text-xs mb-2 outline-none focus:border-amber-400">
       <input type="number" id="room-code" placeholder="Kode Room (cth: 888)" class="w-full py-2 px-3 rounded-xl bg-slate-900/90 border border-emerald-500/50 text-white font-bold text-center text-xs mb-2 outline-none focus:border-amber-400">
 
-      <!-- PILIHAN MODE GAME (BARU) -->
       <div class="flex items-center justify-between bg-slate-900/80 p-1.5 rounded-xl border border-emerald-500/40 mb-3">
         <span class="text-[11px] font-bold text-emerald-200 pl-2">Mode Game:</span>
         <select id="game-mode" class="bg-emerald-950 text-amber-300 font-titan text-xs py-1 px-2 rounded-lg outline-none border border-emerald-600">
@@ -250,7 +249,11 @@
       if (!code) return alert("Masukkan kode room!");
 
       isSpectator = spectatorMode; roomID = "domino_" + code;
-      myID = (isSpectator ? "spec_" : "p_") + Math.random().toString(36).substr(2, 5);
+      
+      // Menggunakan ID tetap dari nama pemain agar sinkronisasi kartu tidak pernah hilang saat refresh/masuk ulang
+      let cleanName = myName.toLowerCase().replace(/[^a-z0-9]/g, '');
+      myID = (isSpectator ? "spec_" : "p_") + (cleanName || Math.random().toString(36).substr(2, 5));
+      
       roomRef = db.ref('rooms/' + roomID);
 
       if (!isSpectator) {
@@ -269,12 +272,16 @@
           roomRef.set(data);
         } else {
           if (!isSpectator) {
-            if (Object.keys(data.players || {}).length >= 4 && !data.players[myID]) {
+            if (!data.players) data.players = {};
+            if (!data.playerOrder) data.playerOrder = [];
+            if (!data.scores) data.scores = {};
+
+            if (Object.keys(data.players).length >= 4 && !data.players[myID]) {
               alert("Slot penuh! Anda masuk sebagai juri."); isSpectator = true;
-            } else if (!data.players[myID] && data.status === "waiting") {
-              if (!data.players) data.players = {}; if (!data.playerOrder) data.playerOrder = []; if (!data.scores) data.scores = {};
-              data.players[myID] = { name: myName, hand: [], isBot: false };
-              data.playerOrder.push(myID); data.scores[myID] = 0;
+            } else {
+              data.players[myID] = { name: myName, hand: data.players[myID]?.hand || [], isBot: false };
+              if (!data.playerOrder.includes(myID)) data.playerOrder.push(myID);
+              if (data.scores[myID] === undefined) data.scores[myID] = 0;
               if (!data.host) data.host = myID;
               roomRef.update(data);
             }
@@ -488,17 +495,28 @@
     function mulaiGameDenganBot() {
       let deck = generateDeck();
       let players = gameState.players || {};
-      let order = gameState.playerOrder ? [...gameState.playerOrder] : [];
+      let order = [];
       let scores = gameState.scores || {};
 
+      // 1. Ambil semua pemain manusia yang benar-benar aktif di room
+      Object.keys(players).forEach(pId => {
+        if (!players[pId].isBot) order.push(pId);
+      });
+
+      // 2. Isi sisa slot yang kosong dengan Bot sampai total pemain tepat 4
       let botCount = 1;
       while (order.length < 4) {
         let botID = "bot_" + botCount;
         players[botID] = { name: "Bot " + botCount, hand: [], isBot: true };
-        order.push(botID); botCount++;
+        order.push(botID);
+        botCount++;
       }
 
-      order.forEach(pId => { players[pId].hand = deck.splice(0, 7); });
+      // 3. Bagikan 7 kartu domino secara merata ke seluruh 4 pemain/bot
+      order.forEach(pId => {
+        players[pId].hand = deck.splice(0, 7);
+      });
+
       roomRef.update({ players, playerOrder: order, scores, status: "playing", board: [], leftVal: -1, rightVal: -1, currentTurnIdx: 0, consecutivePasses: 0, winnerName: null, showdownData: null });
     }
 
