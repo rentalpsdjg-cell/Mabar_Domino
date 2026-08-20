@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Domino Gaple Super Complete Edition</title>
+  <title>Domino Gaple Ultimate - Adu Batu Edition</title>
   
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
@@ -16,25 +16,31 @@
     html, body { height: 100%; width: 100%; margin: 0; padding: 0; overflow: hidden; font-family: 'Fredoka', sans-serif; background: #061e12; }
     .font-titan { font-family: 'Titan One', cursive; }
 
-    /* Kartu Domino Tangan (Vertikal) */
+    .theme-emerald { background: radial-gradient(circle, #0c3823 0%, #04120b 100%); }
+    .theme-blue { background: radial-gradient(circle, #0f2b48 0%, #040d18 100%); }
+    .theme-ruby { background: radial-gradient(circle, #480f1a 0%, #180407 100%); }
+    .theme-obsidian { background: radial-gradient(circle, #222226 0%, #0a0a0c 100%); }
+
+    /* Kartu Normal Tangan */
     .domino-card {
-      width: clamp(24px, 4.5vw, 36px);
-      height: clamp(44px, 8vw, 64px);
-      background: #fdfbf7; border: 1.5px solid #1a1a1a;
-      border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.4); display: flex;
-      flex-direction: column; justify-content: space-between; align-items: center;
-      padding: 2px; cursor: pointer; transition: transform 0.15s; flex-shrink: 0;
+      width: clamp(24px, 4.5vw, 36px); height: clamp(44px, 8vw, 64px);
+      background: #fdfbf7; border: 1.5px solid #1a1a1a; border-radius: 4px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.4); display: flex; flex-direction: column;
+      justify-content: space-between; align-items: center; padding: 2px;
+      cursor: grab; transition: transform 0.15s, box-shadow 0.15s; flex-shrink: 0;
     }
-    .domino-card:active, .domino-card:hover { transform: translateY(-3px); }
+    .domino-card:active { cursor: grabbing; transform: scale(1.08); }
+    .domino-card.dragging { opacity: 0.5; }
     
-    /* Kartu Domino Papan Meja (Horizontal) */
+    /* Kartu Kecil Khusus Pop-Up Adu Batu */
+    .domino-card.mini {
+      width: 18px; height: 32px; border-width: 1px; padding: 1px; border-radius: 2px;
+    }
+
+    /* Kartu Papan Meja */
     .domino-card.horizontal {
-      width: clamp(32px, 5.5vw, 52px);
-      height: clamp(18px, 3.2vw, 28px);
-      flex-direction: row;
-      border-width: 1px;
-      border-radius: 3px;
-      padding: 1px;
+      width: clamp(32px, 5.5vw, 52px); height: clamp(18px, 3.2vw, 28px);
+      flex-direction: row; border-width: 1px; border-radius: 3px; padding: 1px; cursor: default;
     }
 
     .domino-divider-v { width: 100%; height: 1.5px; background: #333; margin: 1px 0; }
@@ -42,109 +48,133 @@
 
     .dot-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); width: 100%; height: 100%; place-items: center; }
     .dot { width: clamp(2px, 0.6vw, 4px); height: clamp(2px, 0.6vw, 4px); background-color: #111; border-radius: 50%; }
+    .domino-card.mini .dot { width: 2px; height: 2px; }
 
-    .glass-panel { background: rgba(15, 45, 28, 0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.15); }
+    .glass-panel { background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.12); }
+    
+    @keyframes floatUp { 0% { opacity: 0; transform: translateY(10px) scale(0.8); } 20% { opacity: 1; transform: translateY(0) scale(1.1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-20px) scale(1); } }
+    .emote-bubble { animation: floatUp 2.5s forwards; }
   </style>
 </head>
-<body class="h-screen w-screen text-white flex flex-col justify-between overflow-hidden">
+<body id="app-body" class="h-screen w-screen text-white flex flex-col justify-between overflow-hidden theme-emerald">
 
+  <!-- MODAL QUICK CHAT -->
+  <div id="emote-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="glass-panel rounded-2xl p-4 w-full max-w-xs text-center border border-amber-400/50">
+      <div class="font-titan text-sm text-amber-400 mb-3">KIRIM EKSPRESI 💬</div>
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <button onclick="kirimEmote('🤣 Wkwkwk!')" class="py-2 bg-slate-800/80 hover:bg-slate-700 rounded-lg text-xs font-bold border border-slate-600">🤣 Wkwkwk!</button>
+        <button onclick="kirimEmote('😱 Aduhh Gaple!')" class="py-2 bg-slate-800/80 hover:bg-slate-700 rounded-lg text-xs font-bold border border-slate-600">😱 Aduhh Gaple!</button>
+        <button onclick="kirimEmote('⚡ Buru-Buru Amat!')" class="py-2 bg-slate-800/80 hover:bg-slate-700 rounded-lg text-xs font-bold border border-slate-600">⚡ Buru-Buru Amat!</button>
+        <button onclick="kirimEmote('🔥 Yakin Menang!')" class="py-2 bg-slate-800/80 hover:bg-slate-700 rounded-lg text-xs font-bold border border-slate-600">🔥 Yakin Menang!</button>
+      </div>
+      <button onclick="toggleModal('emote-modal')" class="w-full py-1.5 bg-red-600 rounded-xl text-xs font-titan">TUTUP</button>
+    </div>
+  </div>
+
+  <!-- MODAL CARD TRACKER -->
+  <div id="tracker-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+    <div class="glass-panel rounded-2xl p-4 w-full max-w-xs text-center border border-emerald-400/50">
+      <div class="font-titan text-sm text-emerald-400 mb-2">📊 SIANG & SISA KARTU (0 - 6)</div>
+      <div id="tracker-grid" class="grid grid-cols-7 gap-1 text-xs font-bold mb-4"></div>
+      <button onclick="toggleModal('tracker-modal')" class="w-full py-1.5 bg-emerald-600 rounded-xl text-xs font-titan">TUTUP</button>
+    </div>
+  </div>
+
+  <!-- MODAL PILIHAN SISI (KIRI / KANAN) -->
   <div id="choice-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-    <div class="glass-panel rounded-2xl p-5 w-full max-w-xs text-center shadow-2xl border border-amber-400">
+    <div class="glass-panel rounded-2xl p-5 w-full max-w-xs text-center border border-amber-400">
       <div class="font-titan text-lg text-amber-400 mb-2">PILIH SISI PAPAN 🧩</div>
-      <p class="text-xs text-emerald-200 mb-4">Kartu Anda cocok di kedua ujung papan. Ingin dipasang di mana?</p>
+      <p class="text-xs text-emerald-200 mb-4">Kartu Anda cocok di kedua ujung papan. Dipasang di mana?</p>
       <div class="flex gap-2">
-        <button id="btn-choice-left" class="w-1/2 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 font-titan text-xs text-white shadow-lg">
-          ⬅️ UJUNG KIRI
-        </button>
-        <button id="btn-choice-right" class="w-1/2 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-titan text-xs text-slate-950 shadow-lg">
-          UJUNG KANAN ➡️
-        </button>
+        <button id="btn-choice-left" class="w-1/2 py-2.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 font-titan text-xs text-white">⬅️ KIRI</button>
+        <button id="btn-choice-right" class="w-1/2 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-titan text-xs text-slate-950">KANAN ➡️</button>
       </div>
     </div>
   </div>
 
-  <div id="winner-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
-    <div class="glass-panel rounded-3xl p-6 w-full max-w-sm text-center shadow-2xl border-2 border-amber-400">
-      <div class="text-5xl mb-2">🏆🎉</div>
-      <div id="modal-title" class="font-titan text-2xl text-amber-400 mb-1">RONDE SELESAI!</div>
-      <div id="winner-name" class="text-base font-bold text-white mb-2">Pemain Menang!</div>
-      <div id="winner-reason" class="text-xs text-emerald-300 italic mb-4">Kartu Habis</div>
-      
-      <button onclick="tutupModalDanLanjut()" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-titan text-slate-950 text-sm shadow-lg hover:brightness-110 active:scale-95 transition-all">
-        LANJUT RONDE / LOBBY 🚀
+  <!-- MODAL WINNER & SHOWDOWN (ADU BATU SISA KARTU) -->
+  <div id="winner-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-3 overflow-y-auto">
+    <div class="glass-panel rounded-3xl p-4 w-full max-w-sm text-center border-2 border-amber-400 my-auto shadow-2xl">
+      <div class="text-4xl mb-1">🏆🎉</div>
+      <div id="modal-title" class="font-titan text-xl text-amber-400 mb-0.5">RONDE SELESAI!</div>
+      <div id="winner-name" class="text-sm font-bold text-white mb-1">Pemain Menang!</div>
+      <div id="winner-reason" class="text-[11px] text-emerald-300 italic mb-3">Kartu Habis</div>
+
+      <!-- BOARD TRANSPARANSI ADU BATU -->
+      <div id="showdown-container" class="hidden bg-slate-950/80 rounded-2xl p-2.5 border border-slate-700/80 mb-4 text-left max-h-[45vh] overflow-y-auto">
+        <div class="font-titan text-center text-xs text-amber-300 mb-2 border-b border-slate-800 pb-1">⚡ HASIL ADU BATU / GAPLE ⚡</div>
+        <div id="showdown-list" class="flex flex-col gap-2"></div>
+      </div>
+
+      <button onclick="tutupModalDanLanjut()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-titan text-slate-950 text-xs shadow-lg hover:brightness-110 active:scale-95 transition-all">
+        LANJUT / LOBBY 🚀
       </button>
     </div>
   </div>
 
+  <!-- LOBBY MAIN MENU -->
   <div id="lobby" class="fixed inset-0 z-40 flex items-center justify-center p-3 bg-gradient-to-br from-emerald-950 via-green-950 to-black">
-    <div class="glass-panel rounded-3xl p-4 sm:p-6 w-full max-w-xs sm:max-w-sm text-center shadow-2xl border border-emerald-500/30">
-      <div class="font-titan text-2xl sm:text-3xl text-amber-400 mb-1">🀏 GAPLE MULTI</div>
-      <p class="text-[11px] text-emerald-200/80 mb-3 sm:mb-4">Main Sendiri (VS Bot) atau Mabar Multi-Device!</p>
+    <div class="glass-panel rounded-3xl p-4 sm:p-6 w-full max-w-xs sm:max-w-sm text-center border border-emerald-500/30">
+      <div class="font-titan text-2xl sm:text-3xl text-amber-400 mb-1">🀏 GAPLE ULTIMATE</div>
+      <p class="text-[11px] text-emerald-200/80 mb-3">Fitur Transparansi Adu Batu Sisa Kartu</p>
 
-      <input type="text" id="player-name" placeholder="Nama Anda" class="w-full py-2 px-3 rounded-xl bg-slate-900/90 border border-emerald-500/50 text-white font-bold text-center text-xs sm:text-sm mb-2 outline-none focus:border-amber-400">
-      <input type="number" id="room-code" placeholder="Kode Room (cth: 888)" class="w-full py-2 px-3 rounded-xl bg-slate-900/90 border border-emerald-500/50 text-white font-bold text-center text-xs sm:text-sm mb-3 outline-none focus:border-amber-400">
+      <input type="text" id="player-name" placeholder="Nama Anda" class="w-full py-2 px-3 rounded-xl bg-slate-900/90 border border-emerald-500/50 text-white font-bold text-center text-xs mb-2 outline-none focus:border-amber-400">
+      <input type="number" id="room-code" placeholder="Kode Room (cth: 888)" class="w-full py-2 px-3 rounded-xl bg-slate-900/90 border border-emerald-500/50 text-white font-bold text-center text-xs mb-3 outline-none focus:border-amber-400">
 
-      <button onclick="masukRoom(false)" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-titan text-sm sm:text-base text-slate-950 shadow-lg hover:brightness-110 active:scale-95 transition-all mb-2">
+      <button onclick="masukRoom(false)" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 font-titan text-xs sm:text-sm text-slate-950 shadow-lg mb-2">
         MASUK PEMAIN 🚀
       </button>
-
-      <button onclick="masukRoom(true)" class="w-full py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 font-titan text-xs sm:text-sm text-white shadow-lg hover:brightness-110 active:scale-95 transition-all mb-2 flex items-center justify-center gap-1.5">
+      <button onclick="masukRoom(true)" class="w-full py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 font-titan text-xs text-white shadow-lg mb-2">
         👁️ JADI JURI / PENONTON
       </button>
-
       <div class="flex gap-2">
-        <button onclick="toggleFullscreen()" class="w-1/2 py-2 rounded-xl bg-slate-800/90 border border-slate-600/50 font-titan text-[11px] text-slate-100 shadow-lg hover:bg-slate-700 active:scale-95 transition-all">
-          🖥️ Fullscreen
-        </button>
-
-        <button onclick="specialResetRoom()" class="w-1/2 py-2 rounded-xl bg-gradient-to-r from-red-800 to-red-900 border border-red-500/40 font-titan text-[11px] text-red-200 shadow-lg hover:brightness-120 active:scale-95 transition-all">
-          💥 Reset Room
-        </button>
+        <button onclick="toggleFullscreen()" class="w-1/2 py-2 rounded-xl bg-slate-800/90 border border-slate-600/50 font-titan text-[10px]">🖥️ Fullscreen</button>
+        <button onclick="specialResetRoom()" class="w-1/2 py-2 rounded-xl bg-gradient-to-r from-red-800 to-red-900 border border-red-500/40 font-titan text-[10px] text-red-200">💥 Reset Room</button>
       </div>
     </div>
   </div>
 
-  <div id="arena" class="hidden flex-col h-screen w-screen bg-emerald-900 justify-between p-2 relative overflow-hidden">
+  <!-- GAME ARENA -->
+  <div id="arena" class="hidden flex-col h-screen w-screen justify-between p-2 relative overflow-hidden">
     
     <div class="glass-panel rounded-xl p-2 flex justify-between items-center text-xs font-bold flex-shrink-0">
       <div class="flex items-center gap-1.5">
         <div>Room: <span id="disp-room" class="text-amber-400">-</span></div>
-        <span id="role-badge" class="bg-amber-500/20 text-amber-300 text-[9px] px-1.5 py-0.5 rounded-full border border-amber-500/30">Pemain</span>
+        <button onclick="toggleTheme()" class="bg-slate-800 hover:bg-slate-700 px-2 py-0.5 rounded-lg text-[10px] border border-slate-600">🎨 Tema</button>
       </div>
-      
       <div class="flex items-center gap-2">
         <div id="disp-turn" class="text-amber-300 font-titan text-xs">Menunggu...</div>
-        <div id="timer-box" class="hidden bg-red-950 border border-red-500/50 text-red-300 px-2 py-0.5 rounded-lg font-titan text-xs animate-pulse">
-          ⏱️ <span id="timer-val">15</span>s
-        </div>
+        <div id="timer-box" class="hidden bg-red-950 border border-red-500/50 text-red-300 px-2 py-0.5 rounded-lg font-titan text-xs animate-pulse">⏱️ <span id="timer-val">15</span>s</div>
       </div>
-
-      <button onclick="keluarRoom()" class="bg-red-600 hover:bg-red-500 px-2.5 py-1 rounded-lg text-white text-[11px]">Keluar</button>
+      <div class="flex items-center gap-1">
+        <button onclick="toggleModal('tracker-modal')" class="bg-emerald-700 px-2 py-1 rounded-lg text-[10px]">📊 Tracker</button>
+        <button onclick="keluarRoom()" class="bg-red-600 px-2 py-1 rounded-lg text-[10px]">Keluar</button>
+      </div>
     </div>
 
-    <div id="leaderboard-bar" class="flex justify-around items-center bg-black/40 rounded-xl py-1 px-2 text-[10px] border border-emerald-500/20 flex-shrink-0"></div>
+    <div id="leaderboard-bar" class="flex justify-around items-center bg-black/40 rounded-xl py-1 px-2 text-[10px] border border-emerald-500/20 flex-shrink-0 relative"></div>
 
     <div id="lobby-waiting" class="glass-panel rounded-xl p-2 text-center my-1 flex-shrink-0">
       <div class="text-[11px] text-emerald-200 mb-1">Pemain Terhubung (<span id="player-count">1</span>/4):</div>
       <div id="player-list" class="flex flex-wrap justify-center gap-1 text-[11px] font-bold mb-2"></div>
-      
-      <button id="btn-start" onclick="mulaiGameDenganBot()" class="bg-gradient-to-r from-emerald-500 to-green-600 font-titan px-3 py-1.5 rounded-xl text-xs text-white shadow-lg hover:brightness-110 active:scale-95 transition-all">
-        ▶️ MULAI GAME (Sisa Slot Diisi Bot)
+      <button id="btn-start" onclick="mulaiGameDenganBot()" class="bg-gradient-to-r from-emerald-500 to-green-600 font-titan px-3 py-1.5 rounded-xl text-xs text-white shadow-lg">
+        ▶️ MULAI GAME (Sisa Slot Bot)
       </button>
     </div>
 
-    <div id="board" class="flex-1 my-1 glass-panel rounded-xl p-2 flex flex-wrap items-center justify-center content-center gap-1.5 border border-emerald-600/40 shadow-inner overflow-hidden min-h-0">
-      <div id="empty-board-msg" class="w-full text-center text-emerald-300/50 text-xs italic">Tekan "Mulai Game" untuk melempar kartu.</div>
+    <div id="board" ondragover="allowDrop(event)" ondrop="handleDrop(event)" class="flex-1 my-1 glass-panel rounded-xl p-2 flex flex-wrap items-center justify-center content-center gap-1.5 border border-emerald-600/40 shadow-inner overflow-hidden min-h-0 relative">
+      <div id="empty-board-msg" class="w-full text-center text-emerald-300/50 text-xs italic">Tarik (drag) kartu ke sini atau klik kartu untuk melempar.</div>
     </div>
 
     <div id="bottom-panel" class="glass-panel rounded-xl p-2 flex flex-col gap-1 flex-shrink-0">
       <div class="flex justify-between items-center text-[11px] px-1">
         <span id="hand-label" class="font-bold text-emerald-200">Kartu Anda (<span id="card-count">0</span>):</span>
-        <button id="btn-pass" onclick="passTurn()" class="hidden bg-amber-500 hover:bg-amber-400 text-slate-950 font-titan px-2.5 py-0.5 rounded text-[11px] shadow-md">
-          LEWAT (PASS) ⏭️
-        </button>
+        <div class="flex items-center gap-1">
+          <button onclick="toggleModal('emote-modal')" class="bg-purple-600 text-white font-titan px-2 py-0.5 rounded text-[11px] shadow">💬 Emote</button>
+          <button id="btn-pass" onclick="passTurn()" class="hidden bg-amber-500 text-slate-950 font-titan px-2 py-0.5 rounded text-[11px] shadow">LEWAT (PASS) ⏭️</button>
+        </div>
       </div>
-
       <div id="hand" class="flex gap-1.5 overflow-x-auto py-1 px-0.5 items-center min-h-[50px] sm:min-h-[70px]"></div>
     </div>
   </div>
@@ -163,56 +193,49 @@
     const db = firebase.database();
 
     let myName = "", roomID = "", myID = "", roomRef = null, gameState = {}, isSpectator = false;
-    let lastBoardLength = 0;
-    let turnTimerInterval = null, turnTimeLeft = 15;
+    let lastBoardLength = 0, turnTimerInterval = null, turnTimeLeft = 15;
+    let draggedCardData = null;
+    const themes = ['theme-emerald', 'theme-blue', 'theme-ruby', 'theme-obsidian'];
+    let currentThemeIdx = 0;
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
+    function toggleTheme() {
+      currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+      document.getElementById('app-body').className = `h-screen w-screen text-white flex flex-col justify-between overflow-hidden ${themes[currentThemeIdx]}`;
+    }
+
+    function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+
     function playTileSound() {
       if (audioCtx.state === 'suspended') audioCtx.resume();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(180, audioCtx.currentTime);
+      const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+      osc.type = 'triangle'; osc.frequency.setValueAtTime(180, audioCtx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.08);
-      gain.gain.setValueAtTime(1, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 0.08);
+      gain.gain.setValueAtTime(1, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.08);
     }
 
     function playPassVoice() {
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance("PAS!");
-        utterance.lang = 'id-ID';
-        utterance.pitch = 1.2;
-        utterance.rate = 1.1;
+        utterance.lang = 'id-ID'; utterance.pitch = 1.2; utterance.rate = 1.1;
         window.speechSynthesis.speak(utterance);
       }
     }
 
-    function triggerConfetti() {
-      if (typeof confetti === 'function') {
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-      }
-    }
+    function triggerConfetti() { if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); }
 
     function toggleFullscreen() {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch((err) => { alert(`Gagal Fullscreen: ${err.message}`); });
-      } else if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(err => alert(`Fullscreen error: ${err.message}`));
+      else if (document.exitFullscreen) document.exitFullscreen();
     }
 
     function generateDeck() {
       let deck = [];
-      for (let i = 0; i <= 6; i++) {
-        for (let j = i; j <= 6; j++) deck.push([i, j]);
-      }
+      for (let i = 0; i <= 6; i++) for (let j = i; j <= 6; j++) deck.push([i, j]);
       return deck.sort(() => Math.random() - 0.5);
     }
 
@@ -220,47 +243,38 @@
       if (audioCtx.state === 'suspended') audioCtx.resume();
       myName = document.getElementById('player-name').value.trim() || (spectatorMode ? "Juri" : "Pemain");
       const code = document.getElementById('room-code').value.trim();
-      if (!code) { alert("Masukkan kode room!"); return; }
+      if (!code) return alert("Masukkan kode room!");
 
-      isSpectator = spectatorMode;
-      roomID = "domino_" + code;
+      isSpectator = spectatorMode; roomID = "domino_" + code;
       myID = (isSpectator ? "spec_" : "p_") + Math.random().toString(36).substr(2, 5);
       roomRef = db.ref('rooms/' + roomID);
+
+      if (!isSpectator) {
+        db.ref(`rooms/${roomID}/players/${myID}`).onDisconnect().update({ isBot: true, name: myName + " (Bot)" });
+      }
 
       roomRef.get().then((snapshot) => {
         let data = snapshot.val();
         if (!data) {
-          if (isSpectator) {
-            data = {
-              players: {}, spectators: { [myID]: { name: myName } },
-              playerOrder: [], currentTurnIdx: 0, board: [], leftVal: -1, rightVal: -1, status: "waiting", host: "", consecutivePasses: 0, scores: {}
-            };
-          } else {
-            data = {
-              players: { [myID]: { name: myName, hand: [], isBot: false } },
-              spectators: {}, playerOrder: [myID], currentTurnIdx: 0, board: [], leftVal: -1, rightVal: -1, status: "waiting", host: myID, consecutivePasses: 0, scores: { [myID]: 0 }
-            };
-          }
+          data = {
+            players: isSpectator ? {} : { [myID]: { name: myName, hand: [], isBot: false } },
+            spectators: isSpectator ? { [myID]: { name: myName } } : {},
+            playerOrder: isSpectator ? [] : [myID], currentTurnIdx: 0, board: [], leftVal: -1, rightVal: -1, status: "waiting", host: isSpectator ? "" : myID, consecutivePasses: 0, scores: isSpectator ? {} : { [myID]: 0 }
+          };
           roomRef.set(data);
         } else {
           if (!isSpectator) {
             if (Object.keys(data.players || {}).length >= 4 && !data.players[myID]) {
-              alert("Slot pemain penuh! Anda masuk sebagai penonton/juri.");
-              isSpectator = true;
+              alert("Slot penuh! Anda masuk sebagai juri."); isSpectator = true;
             } else if (!data.players[myID] && data.status === "waiting") {
-              if (!data.players) data.players = {};
-              if (!data.playerOrder) data.playerOrder = [];
-              if (!data.scores) data.scores = {};
+              if (!data.players) data.players = {}; if (!data.playerOrder) data.playerOrder = []; if (!data.scores) data.scores = {};
               data.players[myID] = { name: myName, hand: [], isBot: false };
-              data.playerOrder.push(myID);
-              data.scores[myID] = 0;
+              data.playerOrder.push(myID); data.scores[myID] = 0;
               if (!data.host) data.host = myID;
               roomRef.update(data);
             }
           }
-          if (isSpectator) {
-            db.ref(`rooms/${roomID}/spectators/${myID}`).set({ name: myName });
-          }
+          if (isSpectator) db.ref(`rooms/${roomID}/spectators/${myID}`).set({ name: myName });
         }
 
         document.getElementById('lobby').classList.add('hidden');
@@ -268,20 +282,14 @@
         document.getElementById('arena').classList.add('flex');
         document.getElementById('disp-room').innerText = code;
         
-        const badge = document.getElementById('role-badge');
-        badge.innerText = isSpectator ? "👁️ JURI / PENONTON" : "🎮 PEMAIN";
-        badge.className = isSpectator ? "bg-blue-500/20 text-blue-300 text-[9px] px-1.5 py-0.5 rounded-full border border-blue-500/30" : "bg-amber-500/20 text-amber-300 text-[9px] px-1.5 py-0.5 rounded-full border border-amber-500/30";
-
         dengarkanServer();
       });
     }
 
     function specialResetRoom() {
       const code = document.getElementById('room-code').value.trim();
-      if (!code) { alert("Masukkan Kode Room!"); return; }
-      if (confirm(`Hapus & Reset Room [${code}]?`)) {
-        db.ref('rooms/domino_' + code).remove().then(() => alert(`Room ${code} berhasil di-reset!`));
-      }
+      if (!code) return alert("Masukkan Kode Room!");
+      if (confirm(`Reset Room [${code}]?`)) db.ref('rooms/domino_' + code).remove().then(() => alert("Room berhasil di-reset!"));
     }
 
     function dengarkanServer() {
@@ -290,15 +298,12 @@
         if (!gameState) return;
 
         const currentBoardLength = gameState.board ? gameState.board.length : 0;
-        if (currentBoardLength > lastBoardLength) {
-          playTileSound();
-        }
+        if (currentBoardLength > lastBoardLength) playTileSound();
         lastBoardLength = currentBoardLength;
 
-        // CEK STATUS KEMENANGAN
         if (gameState.status === 'finished') {
           clearInterval(turnTimerInterval);
-          tampilkanPengumumanMenang(gameState.winnerName, gameState.winReason || "Kartu Habis");
+          tampilkanPengumumanMenang(gameState.winnerName, gameState.winReason || "Kartu Habis", gameState.showdownData);
           return;
         }
 
@@ -306,10 +311,43 @@
         renderLeaderboard();
         renderBoard();
         renderHand();
+        renderCardTracker();
         updateTurnDisplay();
         startTurnTimer();
         cekBotTurn();
       });
+
+      db.ref(`rooms/${roomID}/lastEmote`).on('value', (snap) => {
+        const emoteData = snap.val();
+        if (emoteData) popEmoteBubble(emoteData.senderName, emoteData.text);
+      });
+    }
+
+    function kirimEmote(text) {
+      toggleModal('emote-modal');
+      db.ref(`rooms/${roomID}/lastEmote`).set({ senderName: myName, text, time: Date.now() });
+    }
+
+    function popEmoteBubble(sender, text) {
+      const lb = document.getElementById('leaderboard-bar');
+      const bubble = document.createElement('div');
+      bubble.className = "absolute -bottom-8 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-950 font-titan text-xs px-3 py-1 rounded-full shadow-lg z-30 emote-bubble border border-white";
+      bubble.innerText = `${sender}: ${text}`;
+      lb.appendChild(bubble);
+      setTimeout(() => bubble.remove(), 2500);
+    }
+
+    function renderCardTracker() {
+      const grid = document.getElementById('tracker-grid');
+      const counts = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0};
+      (gameState.board || []).forEach(c => { counts[c[0]]++; counts[c[1]]++; });
+
+      grid.innerHTML = Object.keys(counts).map(num => `
+        <div class="flex flex-col items-center bg-slate-800/80 p-1.5 rounded-lg border border-slate-600">
+          <span class="text-amber-400 font-titan">${num}</span>
+          <span class="text-[10px] text-emerald-300">${counts[num]}/7</span>
+        </div>
+      `).join('');
     }
 
     function renderLeaderboard() {
@@ -318,9 +356,8 @@
       const scores = gameState.scores || {};
 
       lb.innerHTML = Object.keys(players).map(pId => {
-        const p = players[pId];
-        const sc = scores[pId] || 0;
-        return `<div class="flex items-center gap-1"><span class="text-amber-300 font-bold truncate max-w-[50px]">${p.name}:</span> <span class="text-white font-titan">${sc} Win</span></div>`;
+        const p = players[pId]; const sc = scores[pId] || 0;
+        return `<div class="flex items-center gap-1"><span class="text-amber-300 font-bold truncate max-w-[50px]">${p.name}:</span> <span class="text-white font-titan">${sc}W</span></div>`;
       }).join('<span class="text-emerald-600">|</span>');
     }
 
@@ -338,44 +375,61 @@
       turnTimerInterval = setInterval(() => {
         turnTimeLeft--;
         document.getElementById('timer-val').innerText = turnTimeLeft;
-
         if (turnTimeLeft <= 0) {
           clearInterval(turnTimerInterval);
-          // Auto Pass jika habis waktu
           const currentTurnID = gameState.playerOrder[gameState.currentTurnIdx];
-          if (currentTurnID === myID && !isSpectator) {
-            passTurn();
-          }
+          if (currentTurnID === myID && !isSpectator) passTurn();
         }
       }, 1000);
     }
 
-    function tampilkanPengumumanMenang(winnerName, reason) {
+    /* MENAMPILKAN SISA KARTU SEMUA PEMAIN SAAT ADU BATU */
+    function tampilkanPengumumanMenang(winnerName, reason, showdownData) {
       document.getElementById('winner-name').innerText = `🎉 SELAMAT! ${winnerName} MENANG! 🎉`;
       document.getElementById('winner-reason').innerText = `Alasan: ${reason}`;
+      
+      const showdownBox = document.getElementById('showdown-container');
+      const showdownList = document.getElementById('showdown-list');
+
+      if (showdownData && showdownData.length > 0) {
+        showdownBox.classList.remove('hidden');
+        showdownList.innerHTML = showdownData.map(pData => {
+          const isWinner = pData.name === winnerName;
+          const cardsHTML = (pData.hand || []).map(c => createCardUI(c, false, true)).join('');
+          return `
+            <div class="p-2 rounded-xl border ${isWinner ? 'bg-amber-950/60 border-amber-400' : 'bg-slate-900/80 border-slate-700'} flex flex-col gap-1">
+              <div class="flex justify-between items-center text-xs">
+                <span class="${isWinner ? 'text-amber-300 font-bold' : 'text-slate-200'}">${pData.name} ${isWinner ? '👑' : ''}</span>
+                <span class="text-[11px] font-titan ${isWinner ? 'text-amber-400' : 'text-emerald-400'}">Total Bintik: ${pData.totalDots}</span>
+              </div>
+              <div class="flex flex-wrap gap-1 items-center mt-1">
+                ${cardsHTML.length > 0 ? cardsHTML : '<span class="text-[10px] text-gray-400 italic">Kartu Habis</span>'}
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        showdownBox.classList.add('hidden');
+      }
+
       document.getElementById('winner-modal').classList.remove('hidden');
       triggerConfetti();
     }
 
     function tutupModalDanLanjut() {
       document.getElementById('winner-modal').classList.add('hidden');
-      
       if (roomRef && (gameState.host === myID || gameState.playerOrder?.[0] === myID)) {
         let scores = gameState.scores || {};
         let winnerID = Object.keys(gameState.players).find(id => gameState.players[id].name === gameState.winnerName);
-        if (winnerID) {
-          scores[winnerID] = (scores[winnerID] || 0) + 1;
-        }
+        if (winnerID) scores[winnerID] = (scores[winnerID] || 0) + 1;
 
-        // Jika sudah ada yang 3x Menang, Reset Penuh ke Lobby
         if (winnerID && scores[winnerID] >= 3) {
-          alert(`🏆 ${gameState.winnerName} MENJADI JUARA UTAMA DENGAN 3 KEMENANGAN! Game di-reset.`);
-          roomRef.update({ status: "waiting", board: [], leftVal: -1, rightVal: -1, winnerName: null, scores: {} });
+          alert(`🏆 ${gameState.winnerName} JUARA UTAMA (3x Menang)! Room di-reset.`);
+          roomRef.update({ status: "waiting", board: [], leftVal: -1, rightVal: -1, winnerName: null, showdownData: null, scores: {} });
         } else {
-          roomRef.update({ status: "waiting", board: [], leftVal: -1, rightVal: -1, winnerName: null, scores });
+          roomRef.update({ status: "waiting", board: [], leftVal: -1, rightVal: -1, winnerName: null, showdownData: null, scores });
         }
       }
-
       keluarRoom();
     }
 
@@ -388,15 +442,10 @@
       document.getElementById('player-count').innerText = Object.keys(players).length;
       pList.innerHTML = Object.values(players).map(p => `<span class="bg-emerald-950/80 px-2 py-0.5 rounded-lg border border-emerald-500/30 text-[10px]">${p.name} ${p.isBot ? '🤖': ''}</span>`).join('');
 
-      if (gameState.status === 'playing') {
-        waitingBox.classList.add('hidden');
-      } else {
+      if (gameState.status === 'playing') waitingBox.classList.add('hidden');
+      else {
         waitingBox.classList.remove('hidden');
-        if (!isSpectator && (gameState.host === myID || gameState.playerOrder?.[0] === myID)) {
-          btnStart.style.display = 'inline-block';
-        } else {
-          btnStart.style.display = 'none';
-        }
+        btnStart.style.display = (!isSpectator && (gameState.host === myID || gameState.playerOrder?.[0] === myID)) ? 'inline-block' : 'none';
       }
     }
 
@@ -411,13 +460,11 @@
         let botID = "bot_" + botCount;
         players[botID] = { name: "Bot " + botCount, hand: [], isBot: true };
         scores[botID] = scores[botID] || 0;
-        order.push(botID);
-        botCount++;
+        order.push(botID); botCount++;
       }
 
       order.forEach(pId => { players[pId].hand = deck.splice(0, 7); });
-
-      roomRef.update({ players, playerOrder: order, scores, status: "playing", board: [], leftVal: -1, rightVal: -1, currentTurnIdx: 0, consecutivePasses: 0, winnerName: null });
+      roomRef.update({ players, playerOrder: order, scores, status: "playing", board: [], leftVal: -1, rightVal: -1, currentTurnIdx: 0, consecutivePasses: 0, winnerName: null, showdownData: null });
     }
 
     function updateTurnDisplay() {
@@ -427,15 +474,13 @@
       const turnName = gameState.players[turnID] ? gameState.players[turnID].name : "Pemain";
 
       document.getElementById('disp-turn').innerText = isMyTurn ? "🎯 GILIRAN ANDA!" : `⏳ Giliran ${turnName}`;
-
       const passBtn = document.getElementById('btn-pass');
+
       if (isMyTurn && gameState.board.length > 0) {
         const myHand = gameState.players[myID]?.hand || [];
         const canPlay = myHand.some(c => c[0] === gameState.leftVal || c[1] === gameState.leftVal || c[0] === gameState.rightVal || c[1] === gameState.rightVal);
         passBtn.classList.toggle('hidden', canPlay);
-      } else {
-        passBtn.classList.add('hidden');
-      }
+      } else passBtn.classList.add('hidden');
     }
 
     function cekBotTurn() {
@@ -454,8 +499,7 @@
 
       if (board.length === 0) {
         let card = botHand.shift();
-        board.push(card); left = card[0]; right = card[1];
-        passes = 0;
+        board.push(card); left = card[0]; right = card[1]; passes = 0;
       } else {
         let matchIdx = -1, isLeft = false, flip = false;
         for (let i = 0; i < botHand.length; i++) {
@@ -472,42 +516,44 @@
           else { board.push(flip ? [c[1], c[0]] : c); right = flip ? c[0] : c[1]; }
           passes = 0;
         } else {
-          playPassVoice();
-          passes++;
+          playPassVoice(); passes++;
         }
       }
 
-      // CEK GAPLE / DEADLOCK (Semua PASS 4x)
-      if (passes >= gameState.playerOrder.length) {
-        hitungKemenanganGaple();
-        return;
-      }
+      if (passes >= gameState.playerOrder.length) return hitungKemenanganGaple();
 
-      // CEK KEMENANGAN BOT
       if (botHand.length === 0) {
-        const botName = gameState.players[botID].name;
-        roomRef.update({ board, status: "finished", winnerName: botName, winReason: "Kartu Habis!" });
-        return;
+        return roomRef.update({ board, status: "finished", winnerName: gameState.players[botID].name, winReason: "Kartu Habis!" });
       }
 
       let nextTurn = (gameState.currentTurnIdx + 1) % gameState.playerOrder.length;
       roomRef.update({ board, leftVal: left, rightVal: right, [`players/${botID}/hand`]: botHand, currentTurnIdx: nextTurn, consecutivePasses: passes });
     }
 
+    /* MENGHITUNG KARTU DAN MEMBUAT DATA TRANSPARANSI ADU BATU */
     function hitungKemenanganGaple() {
-      let minDots = 999;
-      let winnerName = "Tidak Ada";
-      const players = gameState.players || {};
+      let minDots = 999, winnerName = "Tidak Ada";
+      let showdownData = [];
 
-      Object.values(players).forEach(p => {
+      Object.values(gameState.players || {}).forEach(p => {
         let totalDots = (p.hand || []).reduce((sum, c) => sum + c[0] + c[1], 0);
+        showdownData.push({ name: p.name, hand: p.hand || [], totalDots });
+
         if (totalDots < minDots) {
           minDots = totalDots;
           winnerName = p.name;
         }
       });
 
-      roomRef.update({ status: "finished", winnerName, winReason: `GAPLE / DEADLOCK! (Sisa Bintik Terkecil: ${minDots})` });
+      // Urutkan showdownData dari bintik terkecil
+      showdownData.sort((a, b) => a.totalDots - b.totalDots);
+
+      roomRef.update({
+        status: "finished",
+        winnerName,
+        winReason: `GAPLE / ADU BATU! (Bintik Terkecil: ${minDots})`,
+        showdownData
+      });
     }
 
     function renderDotPattern(num) {
@@ -518,15 +564,15 @@
       return `<div class="dot-grid">${dots}</div>`;
     }
 
-    function createCardUI(card, isHoriz = false) {
-      return `<div class="domino-card ${isHoriz ? 'horizontal' : ''}">${renderDotPattern(card[0])}<div class="${isHoriz ? 'domino-divider-h' : 'domino-divider-v'}"></div>${renderDotPattern(card[1])}</div>`;
+    function createCardUI(card, isHoriz = false, isMini = false) {
+      return `<div class="domino-card ${isHoriz ? 'horizontal' : ''} ${isMini ? 'mini' : ''}">${renderDotPattern(card[0])}<div class="${isHoriz ? 'domino-divider-h' : 'domino-divider-v'}"></div>${renderDotPattern(card[1])}</div>`;
     }
 
     function renderBoard() {
       const boardEl = document.getElementById('board');
       boardEl.innerHTML = '';
       if (!gameState.board || gameState.board.length === 0) {
-        boardEl.innerHTML = '<div id="empty-board-msg" class="w-full text-center text-emerald-300/50 text-xs italic">Tekan "Mulai Game" untuk melempar kartu.</div>';
+        boardEl.innerHTML = '<div id="empty-board-msg" class="w-full text-center text-emerald-300/50 text-xs italic">Tarik (drag) kartu ke sini atau klik kartu untuk melempar.</div>';
         return;
       }
       gameState.board.forEach(card => {
@@ -543,10 +589,8 @@
       handEl.innerHTML = '';
 
       if (isSpectator) {
-        const players = gameState.players || {};
-        handLabel.innerHTML = `<span class="font-bold text-amber-300">📊 MONITOR JURI (Sisa Kartu Pemain):</span>`;
-        
-        Object.values(players).forEach(p => {
+        handLabel.innerHTML = `<span class="font-bold text-amber-300">📊 MONITOR JURI:</span>`;
+        Object.values(gameState.players || {}).forEach(p => {
           const pBox = document.createElement('div');
           pBox.className = "flex flex-col items-center bg-emerald-950/80 p-1 rounded-lg border border-emerald-500/30 text-[10px] min-w-[65px]";
           pBox.innerHTML = `<span class="font-bold text-amber-200 truncate max-w-[60px]">${p.name}</span><span class="text-xs font-titan text-white">${p.hand ? p.hand.length : 0} Kartu</span>`;
@@ -560,16 +604,33 @@
 
       myHand.forEach((card, idx) => {
         const wrapper = document.createElement('div');
-        wrapper.className = "flex-shrink-0";
+        wrapper.className = "flex-shrink-0"; wrapper.draggable = true;
         wrapper.innerHTML = createCardUI(card, false);
+
+        wrapper.ondragstart = (e) => {
+          draggedCardData = { card, idx };
+          e.target.classList.add('dragging');
+        };
+        wrapper.ondragend = (e) => e.target.classList.remove('dragging');
         wrapper.onclick = () => mainkanKartu(card, idx);
+
         handEl.appendChild(wrapper);
       });
     }
 
+    function allowDrop(ev) { ev.preventDefault(); }
+
+    function handleDrop(ev) {
+      ev.preventDefault();
+      if (draggedCardData) {
+        mainkanKartu(draggedCardData.card, draggedCardData.idx);
+        draggedCardData = null;
+      }
+    }
+
     function mainkanKartu(card, idx) {
       if (isSpectator || gameState.status !== 'playing') return;
-      if (gameState.playerOrder[gameState.currentTurnIdx] !== myID) { alert("Bukan giliran Anda!"); return; }
+      if (gameState.playerOrder[gameState.currentTurnIdx] !== myID) return alert("Bukan giliran Anda!");
 
       let board = gameState.board || [];
       let left = gameState.leftVal, right = gameState.rightVal;
@@ -581,31 +642,18 @@
         let fitLeft = (newCard[0] === left || newCard[1] === left);
         let fitRight = (newCard[0] === right || newCard[1] === right);
 
-        // FITUR PILIHAN SISIPAN (Jika cocok di Kiri DAN Kanan)
-        if (fitLeft && fitRight && left !== right) {
-          tampilkanPilihanSisi(newCard, idx);
-        } else if (fitLeft) {
-          eksekusiPasang(newCard, idx, 'left');
-        } else if (fitRight) {
-          eksekusiPasang(newCard, idx, 'right');
-        } else {
-          alert("Kartu tidak cocok!");
-        }
+        if (fitLeft && fitRight && left !== right) tampilkanPilihanSisi(newCard, idx);
+        else if (fitLeft) eksekusiPasang(newCard, idx, 'left');
+        else if (fitRight) eksekusiPasang(newCard, idx, 'right');
+        else alert("Kartu tidak cocok!");
       }
     }
 
     function tampilkanPilihanSisi(card, idx) {
       const modal = document.getElementById('choice-modal');
       modal.classList.remove('hidden');
-
-      document.getElementById('btn-choice-left').onclick = () => {
-        modal.classList.add('hidden');
-        eksekusiPasang(card, idx, 'left');
-      };
-      document.getElementById('btn-choice-right').onclick = () => {
-        modal.classList.add('hidden');
-        eksekusiPasang(card, idx, 'right');
-      };
+      document.getElementById('btn-choice-left').onclick = () => { modal.classList.add('hidden'); eksekusiPasang(card, idx, 'left'); };
+      document.getElementById('btn-choice-right').onclick = () => { modal.classList.add('hidden'); eksekusiPasang(card, idx, 'right'); };
     }
 
     function eksekusiPasang(card, idx, side) {
@@ -627,8 +675,7 @@
       myHand.splice(idx, 1);
 
       if (myHand.length === 0) {
-        roomRef.update({ board, status: "finished", winnerName: myName, winReason: "Kartu Habis!", [`players/${myID}/hand`]: [] });
-        return;
+        return roomRef.update({ board, status: "finished", winnerName: myName, winReason: "Kartu Habis!", [`players/${myID}/hand`]: [] });
       }
 
       let nextTurn = (gameState.currentTurnIdx + 1) % gameState.playerOrder.length;
@@ -638,14 +685,8 @@
     function passTurn() {
       if (isSpectator) return;
       playPassVoice();
-
       let passes = (gameState.consecutivePasses || 0) + 1;
-
-      // CEK GAPLE / DEADLOCK
-      if (passes >= gameState.playerOrder.length) {
-        hitungKemenanganGaple();
-        return;
-      }
+      if (passes >= gameState.playerOrder.length) return hitungKemenanganGaple();
 
       let nextTurn = (gameState.currentTurnIdx + 1) % gameState.playerOrder.length;
       roomRef.update({ currentTurnIdx: nextTurn, consecutivePasses: passes });
